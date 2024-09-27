@@ -11,8 +11,7 @@ app.post('/api/v1/login', (req, res) => {
   const { username, password } = req.body;
   console.log(username, password);  
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
-
+    return res.status(400).json({ message: "Username and password are required without this u cant proceed"});
   }
 
   if (username === 'admin' && password === 'admin') {
