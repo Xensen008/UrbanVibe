@@ -28,7 +28,6 @@ function App() {
             <Route path="/" exact element={<Home/>} />
             <Route path="/Cart" element={<Cart/>} />
           </Routes>
-          This site is under development
         </Container>
       </BrowserRouter>
     </ThemeProvider>
