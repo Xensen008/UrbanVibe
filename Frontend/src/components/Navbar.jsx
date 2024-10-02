@@ -142,13 +142,13 @@ const MobileMenu = styled.ul`
   z-index: ${({ isOpen }) => isOpen ? '1000' : '-1000'};
 `
 
-function Navbar() {
+function Navbar({openAuth, setOpenAuth}) {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
     <Nav>
       <NavbarContainer>
-        <MobileIcon  onClick={()=> setIsOpen(!isOpen)} >
+        <MobileIcon style={{cursor:"pointer"}}  onClick={()=> setIsOpen(!isOpen)} >
           <MenuRounded style={{ color: "inherit" }} />
         </MobileIcon>
 
@@ -180,8 +180,8 @@ function Navbar() {
             }}
           
           >
-             <Button text="Sign Up" outlined small  /> 
-            <Button text="Sign In" small />
+             <Button text="Sign Up" outlined small onClick={()=>setOpenAuth(!openAuth)} /> 
+            <Button text="Sign In" small onClick={()=>setOpenAuth(!openAuth)} />
           </div>
         </MobileMenu>
       )}
@@ -208,7 +208,7 @@ function Navbar() {
           <Navlink to="/Cart">
             <ShoppingCartOutlined sx={{ color: "inherit", fontSize: "28px" }} />
           </Navlink>
-          <Button text="Sign In" small />
+          <Button text="Sign In" small onClick={()=>setOpenAuth(!openAuth)}/>
         </ButtonContainer>
       </NavbarContainer>
     </Nav>

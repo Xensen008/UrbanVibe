@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
+import Authentication from "./pages/Authentication";
 
 const Container = styled.div`
   width: 100%;
@@ -19,15 +20,18 @@ const Container = styled.div`
 `;
 
 function App() {
+  const [openAuth, setOpenAuth] = React.useState(false);
+
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
         <Container>
-          <Navbar />
+          <Navbar setOpenAuth={setOpenAuth} />
           <Routes>
             <Route path="/" exact element={<Home/>} />
             <Route path="/Cart" element={<Cart/>} />
           </Routes>
+          {openAuth && <Authentication openAuth={openAuth} setOpenAuth={setOpenAuth} />}
         </Container>
       </BrowserRouter>
     </ThemeProvider>
