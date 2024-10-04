@@ -132,7 +132,7 @@ const MobileMenu = styled.ul`
   padding: 12px 40px 24px 40px;
   background-color: ${({ theme }) => theme.card_light + 99};
   position: absolute;
-  top: 60px;
+  top: 39px;
   right: 0;
   transition: all 0.5s ease-in-out; 
   transform: ${({ isOpen }) => isOpen ? 'translateY(0)' : 'translateY(-100%)'};
@@ -140,6 +140,7 @@ const MobileMenu = styled.ul`
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2); 
   opacity: ${({ isOpen }) => isOpen ? '100%' : '0'};
   z-index: ${({ isOpen }) => isOpen ? '1000' : '-1000'};
+  backdrop-filter: blur(30px); 
 `
 
 function Navbar({openAuth, setOpenAuth}) {
