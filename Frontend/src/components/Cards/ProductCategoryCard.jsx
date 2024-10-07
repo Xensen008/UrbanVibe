@@ -4,17 +4,20 @@ import styled from 'styled-components';
 
 
 const Card = styled.div`
-  width: 250px;
+  width: 220px; 
   display: flex;
   flex-direction: column;
   gap: 16px;
   transition: all 0.3s ease-out;
   cursor: pointer;
+  @media (max-width: 768px) {
+    width: 175px;
+  }
 `
 
 const Image = styled.img`
   width: 100%;
-  height: 320px;
+  height: 250px;
   border-radius: 6px;
   object-fit: cover;
   transition: all 0.3s ease-out;
@@ -29,6 +32,7 @@ const Top = styled.div`
   transition: all 0.3s ease-out;
   &:hover{
     background-color: ${({ theme }) => theme.primary};
+    transform: scale(1.05);
   }
   &:hover ${Image}{
     opacity: 0.8;
