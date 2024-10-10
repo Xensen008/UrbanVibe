@@ -6,6 +6,12 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import Authentication from "./pages/Authentication";
+import NewArrival from "./pages/NewArrival";
+import Favourite from "./pages/Favourite";
+import ShopListing from "./pages/ShopListing";
+import Orders from "./pages/Orders";
+import ContactUs from "./pages/ContactUs";
+
 
 const Container = styled.div`
   width: 100%;
@@ -29,6 +35,11 @@ function App() {
           <Navbar setOpenAuth={setOpenAuth} />
           <Routes>
             <Route path="/" exact element={<Home/>} />
+            <Route path="/Shop" exact element={<ShopListing/>} />
+            <Route path="/Wishlist" element={<Favourite/>} />
+            <Route path="/New-Arrival" element={<NewArrival/>} />
+            <Route path="/Contact-Us" element={<ContactUs/>} />
+            <Route path="/orders" element={<Orders/>} />
             <Route path="/Cart" element={<Cart/>} />
           </Routes>
           {openAuth && <Authentication openAuth={openAuth} setOpenAuth={setOpenAuth} />}

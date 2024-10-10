@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import HeroImg from '../utils/Images/Header.png'
 import { category } from '../utils/data'
 import ProductCategoryCard from '../components/Cards/ProductCategoryCard'
-import ProductCard from '../components/Cards/ProductCard'
+import ProductCard from '../components/cards/ProductCard'
 
 const Container = styled.div`
   padding: 20px 30px;
