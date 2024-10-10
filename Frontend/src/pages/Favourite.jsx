@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import ProductCard from '../components/cards/ProductCard'
+import { motion } from 'framer-motion';
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -39,14 +40,27 @@ const CardWrapper = styled.div`
   justify-content: center;
   @media (max-width: 750px) {
     gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 function Favourite() {
+  const fadeInVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.8 } }
+  };
+
   return (
     <Container>
       <Section>
         <Title>Your Favourite</Title>
-        <CardWrapper>
+        <CardWrapper
+          as={motion.div}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInVariants}
+        >
           <ProductCard/>
           <ProductCard/>
           <ProductCard/>

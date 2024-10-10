@@ -36,6 +36,10 @@ const Menu = styled.div`
   display: none;
   flex-direction: column;
   gap: 12px;
+
+  @media (max-width: 768px) {
+    display: flex;  // Always display on small screens
+  }
 `
 const Top = styled.div`
   display: flex;
@@ -44,14 +48,29 @@ const Top = styled.div`
   border-radius: 6px;
   position: relative;
   transition: all 0.3s ease-out;
-  &:hover{
+
+  &:hover {
     background-color: ${({ theme }) => theme.primary};
   }
-  &:hover ${Image}{
+
+  &:hover ${Image} {
     opacity: 0.8;
   }
-  &:hover ${Menu}{
+
+  &:hover ${Menu} {
     display: flex;
+  }
+
+  @media (max-width: 768px) {
+    &:hover ${Menu} {
+      display: flex;  
+    }
+    ${Menu} {
+      display: flex;  
+    }
+    ${Image} {
+      opacity: 1;  
+    }
   }
 `
 

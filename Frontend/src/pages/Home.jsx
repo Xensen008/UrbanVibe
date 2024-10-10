@@ -4,6 +4,9 @@ import HeroImg from '../utils/Images/Header.png'
 import { category } from '../utils/data'
 import ProductCategoryCard from '../components/Cards/ProductCategoryCard'
 import ProductCard from '../components/cards/ProductCard'
+import { motion } from 'framer-motion'
+
+
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -54,29 +57,43 @@ const CardWrapper = styled.div`
   }
 
 `
+const AnimatedSection = motion(Section)
 function Home() {
   return (
     <Container>
-      <Section 
+      <AnimatedSection 
         style={{
           alignItems: 'center',
         }}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
       >
         <Img src={HeroImg} alt="heroImage"/>
-      </Section>
-      <Section 
+      </AnimatedSection>
+      <AnimatedSection 
         style={{
           alignItems: 'center',
         }}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
       >
         <Title>Shop by Categories</Title>
         <CardWrapper>
           {category.map((category) => (
-            <ProductCategoryCard category={category} />
+            <ProductCategoryCard key={category.id} category={category} />
           ))}
         </CardWrapper>
-      </Section>
-      <Section>
+      </AnimatedSection>
+      <AnimatedSection
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
+      >
         <Title center>Our Bestseller</Title>
         <CardWrapper>
           <ProductCard />
@@ -84,7 +101,7 @@ function Home() {
           <ProductCard />
           <ProductCard />
         </CardWrapper>
-      </Section>
+      </AnimatedSection>
     </Container>
   )
 }

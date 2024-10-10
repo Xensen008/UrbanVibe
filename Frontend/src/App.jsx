@@ -11,6 +11,7 @@ import Favourite from "./pages/Favourite";
 import ShopListing from "./pages/ShopListing";
 import Orders from "./pages/Orders";
 import ContactUs from "./pages/ContactUs";
+import ProductDetails from "./pages/ProductDetails";
 
 
 const Container = styled.div`
@@ -41,6 +42,7 @@ function App() {
             <Route path="/Contact-Us" element={<ContactUs/>} />
             <Route path="/orders" element={<Orders/>} />
             <Route path="/Cart" element={<Cart/>} />
+            <Route path="/Shop/:id" element={<ProductDetails/>} />
           </Routes>
           {openAuth && <Authentication openAuth={openAuth} setOpenAuth={setOpenAuth} />}
         </Container>
