@@ -44,8 +44,9 @@ export const UserLogin = async (req, res, next )=>{
         if (!user) return next(createError(404, "User not found"));
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
+        const isEmailCorrect = user.email === email;
         if (!isPasswordCorrect) return next(createError(400, "Wrong credentials"));
+        if(!isEmailCorrect) return next(createError(400, "Wrong email"));
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, {
             expiresIn: "7d"
