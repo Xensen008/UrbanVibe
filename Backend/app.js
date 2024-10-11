@@ -1,28 +1,61 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+dotenv.config();
+import mongoose from 'mongoose';
+
+const dbUrl = process.env.DB_URL;
+const port = process.env.PORT || 3000;
+
 
 // Middleware
-app.use(express.json());
+const app = express();
+app.use(cors());
+app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true }));
 
-// Simple login route
-app.post('/api/v1/login', (req, res) => {
-  const { username, password } = req.body;
-  console.log(username, password);  
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required without this u cant proceed"});
-  }
-
-  if (username === 'admin' && password === 'admin') {
-    res.status(200).json({ message: "Login successful" });
-  } else {
-    res.status(401).json({ message: "Invalid credentials" });
-  }
+//error handling middleware
+app.use((err,req,res,next) => {
+  const errorStatus = err.status || 500;
+  const errorMessage = err.message || "Something went wrong";
+  return res.status(errorStatus).json({
+    success: false, message: errorMessage
+  });
 });
+
+
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: "Welcome to UrbanVibe API"
+  });
+});
+
+//Connect to Database
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(dbUrl);
+    console.log("Connected to Database");
+  } catch (error) { 
+    console.error("Error connecting to Database:", error);
+  }
+};
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`http://localhost:${port}`);
-});
+const startServer = async () => {
+  try {
+    await connectToDatabase();
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+      console.log(`http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Error starting the server:', error);
+  }
+};
+
+try {
+  startServer();
+} catch (error) {
+  console.error('Failed to start the server:', error);
+}
