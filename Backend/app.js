@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
 import mongoose from 'mongoose';
+import UserRoute from './Routes/User.route.js';
 
 const dbUrl = process.env.DB_URL;
 const port = process.env.PORT || 3000;
@@ -30,7 +31,7 @@ app.get('/', (req, res) => {
     message: "Welcome to UrbanVibe API"
   });
 });
-
+app.use("/api/user", UserRoute);
 //Connect to Database
 const connectToDatabase = async () => {
   try {
