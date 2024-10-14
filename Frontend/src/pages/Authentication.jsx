@@ -104,11 +104,11 @@ function Authentication({ openAuth, setOpenAuth }) {
           </CloseButton>
           {login ? 
           <>
-            <SignIn/>
+            <SignIn setOpenAuth={setOpenAuth}/>
             <Text> Don't have an Account ?<TextButton onClick={()=>setLogin(false)}>Sign Up</TextButton></Text>
           </> : 
           <>
-            <SignUp/>
+            <SignUp setOpenAuth={setOpenAuth} setLogin={setLogin} />
             <Text> Already have an account ?<TextButton onClick={()=>setLogin(true)}>Sign In</TextButton></Text>
           </>}  
         </Right>

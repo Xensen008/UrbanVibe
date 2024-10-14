@@ -10,7 +10,7 @@ dotenv.config();
 // User Register
 export const UserRegister = async (req, res, next) => {
     try {
-        const { email, password, name, img } = req.body;
+        const { email, password, name, imageUrl } = req.body;
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
@@ -19,10 +19,14 @@ export const UserRegister = async (req, res, next) => {
 
         // Generate salt
         const salt = await bcrypt.genSalt(10);
-        // Hash password with generated salt
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({ email, password: hashedPassword, name, img });
+        const newUser = new User({ 
+            email, 
+            password: hashedPassword, 
+            name, 
+            img: imageUrl 
+        });
         await newUser.save();
 
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_KEY, {
