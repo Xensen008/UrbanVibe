@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Rating from '@mui/material/Rating';
 import Button from '../components/Button'
-import { FavoriteRounded } from '@mui/icons-material'
+import { FavoriteRounded, FavoriteBorder } from '@mui/icons-material'
+import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { getProductDetails, addToFavourite, deleteFromFavourite, addToCart, getFavourite } from '../api';
+import { CircularProgress } from '@mui/material';
+import { openSnackbar } from '../Redux/reducer/snackbarSlice';
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -118,39 +125,178 @@ const ButtonWrapper = styled.div`
 `;
 
 function ProductDetails() {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [product, setProduct] = useState();
+  const [selected, setSelected] = useState();
+  const [favorite, setFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+
+
+  const getProduct = async () => {
+    setLoading(true);
+    await getProductDetails(id).then((res) => {
+      setProduct(res.data);
+      setLoading(false);
+    });
+  };
+
+  const addFavorite = async () => {
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await addToFavourite(token, { productId: product?._id })
+      .then((res) => {
+        setFavorite(true);
+        setFavoriteLoading(false);
+      })
+      .catch((err) => {
+        setFavoriteLoading(false);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const removeFavorite = async () => {
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await deleteFromFavourite(token, { productId: product?._id })
+      .then((res) => {
+        setFavorite(false);
+        setFavoriteLoading(false);
+      })
+      .catch((err) => {
+        setFavoriteLoading(false);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const addCart = async () => {
+    setCartLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await addToCart(token, { productId: product?._id, quantity: 1 })
+      .then((res) => {
+        setCartLoading(false);
+        navigate("/cart");
+      })
+      .catch((err) => {
+        setCartLoading(false);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const checkFavourite = async () => {
+    if (!product) return; // Exit if product is not loaded yet
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    try {
+      const res = await getFavourite(token);
+      if (res.data && Array.isArray(res.data.favourites)) {
+        const isFavorite = res.data.favourites.some(
+          (favorite) => favorite._id === product._id
+        );
+        setFavorite(isFavorite);
+      } else {
+        console.error("Unexpected response format:", res.data);
+        setFavorite(false);
+      }
+    } catch (err) {
+      console.error("Error checking favourite:", err);
+      dispatch(
+        openSnackbar({
+          message: err.message || "Error checking favourite status",
+          severity: "error",
+        })
+      );
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getProduct();
+  }, [id]);
+  
+  useEffect(() => {
+    if (product) {
+      checkFavourite();
+    }
+  }, [product]);
+
   return (
     <Container>
-      <Wrapper>
-        <ImageWrapper>
-          <Image src='https://jaxsonmaximus.com/wp-content/uploads/2020/04/34394c211f01e58539f91e79e6ce1420.jpg' />
-        </ImageWrapper>
-        <Details>
-          <div>
-            <Title>Demo</Title>
-            <Name>Demo</Name>
-          </div>
-          <Rating value={4} />
-          <Price>
-            $120 <Span>150</Span><Percent>40% off</Percent>
-          </Price>
-          <Desc>Description of the product Lorem, ipsum dolor sit amet consectetur adipisicing elit.</Desc>
-          <Sizes>
-          <Items>
-            <Item selected>S</Item>
-            <Item>M</Item>
-            <Item>L</Item>
-            <Item>XL</Item>
-          </Items>
-        </Sizes>
-        <ButtonWrapper>
-          <Button full outlined text='Add to cart' />
-          <Button full text='Buy Now' />
-          <Button full outlined leftIcon={<FavoriteRounded sx={{ color: "red", fontSize: "22px" }} />} />
-        </ButtonWrapper>
-        </Details>
-      </Wrapper>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <Wrapper>
+          <ImageWrapper>
+            <Image src={product?.img} />
+          </ImageWrapper>
+          <Details>
+            <div>
+              <Title>{product?.title}</Title>
+              <Name>{product?.name}</Name>
+            </div>
+            <Rating value={3.5} />
+            <Price>
+              ${product?.price?.org} <Span>${product?.price?.mrp}</Span>{" "}
+              <Percent> (${product?.price?.off}% Off) </Percent>
+            </Price>
+            <Desc>{product?.desc}</Desc>
+            <Sizes>
+              <Items>
+                {product?.sizes.map((size) => (
+                  <Item
+                    key={size}
+                    selected={selected === size}
+                    onClick={() => setSelected(size)}
+                  >
+                    {size}
+                  </Item>
+                ))}
+              </Items>
+            </Sizes>
+            <ButtonWrapper>
+              <Button
+                text="Add to Cart"
+                full
+                outlined
+                isLoading={cartLoading}
+                onClick={() => addCart()}
+              />
+              <Button text="Buy Now" full />
+              <Button
+                leftIcon={
+                  favorite ? (
+                    <FavoriteRounded sx={{ fontSize: "22px", color: "red" }} />
+                  ) : (
+                    <FavoriteBorder sx={{ fontSize: "22px" }} />
+                  )
+                }
+                full
+                outlined
+                isLoading={favoriteLoading}
+                onClick={() => (favorite ? removeFavorite() : addFavorite())}
+              />
+            </ButtonWrapper>
+          </Details>
+        </Wrapper>
+      )}
     </Container>
-  )
-}
+  );
+};
 
 export default ProductDetails

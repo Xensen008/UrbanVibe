@@ -178,9 +178,9 @@ const ShopListing = () => {
                     </Item>
                   ) : filters.value === "category" ? (
                     <Item>
-                      {filters.items.map((item) => (
+                      {filters.items.map((item, index) => (
                         <SelectableItem
-                          key={item}
+                          key={`${filters.value}-${item}-${index}`}
                           selected={selectedCategories.includes(item)}
                           onClick={() =>
                             setSelectedCategories((prevCategories) =>

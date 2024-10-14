@@ -210,13 +210,14 @@ function ProductCard({ product }) {
       });
   };
   const checkFavourite = async () => {
+    if (!product) return; // Exit if product is not loaded yet
     setFavoriteLoading(true);
     const token = localStorage.getItem("Urban-token");
     try {
       const res = await getFavourite(token);
       if (res.data && Array.isArray(res.data.favourites)) {
         const isFavorite = res.data.favourites.some(
-          (favorite) => favorite._id === product?._id
+          (favorite) => favorite._id === product._id
         );
         setFavorite(isFavorite);
       } else {
@@ -236,8 +237,10 @@ function ProductCard({ product }) {
     }
   };
   useEffect(() => {
-    checkFavourite();
-  }, [favorite]);
+    if (product) {
+      checkFavourite();
+    }
+  }, [product]);
   return (
     <Card>
       <Top>

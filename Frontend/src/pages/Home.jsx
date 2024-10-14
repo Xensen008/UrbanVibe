@@ -115,7 +115,7 @@ function Home() {
       >
         <Title center>Our Bestseller</Title>
         <CardWrapper>
-          {products.map((product) => (
+          {products?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </CardWrapper>
