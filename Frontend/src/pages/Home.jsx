@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import HeroImg from '../utils/Images/Header.png'
 import { category } from '../utils/data'
 import ProductCategoryCard from '../components/Cards/ProductCategoryCard'
 import ProductCard from '../components/cards/ProductCard'
 import { motion } from 'framer-motion'
-
+import { getAllProducts } from '../api'
 
 
 const Container = styled.div`
@@ -43,7 +43,7 @@ const Title = styled.div`
   font-size: 28px;
   font-weight: 500;
   display: flex;
-  justify-content: ${({center})=> (center ? 'center' : 'space-between')};
+  justify-content: ${({ center }) => (center ? 'center' : 'space-between')};
   align-items: center; 
 
 `
@@ -59,9 +59,28 @@ const CardWrapper = styled.div`
 `
 const AnimatedSection = motion(Section)
 function Home() {
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+
+  const getProducts = async () => {
+    setLoading(true);
+    await getAllProducts()
+      .then((res) => {
+        setProducts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      })
+  }
+
+  useEffect(() => {
+    getProducts();
+  }, []);
   return (
     <Container>
-      <AnimatedSection 
+      <AnimatedSection
         style={{
           alignItems: 'center',
         }}
@@ -70,9 +89,9 @@ function Home() {
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
       >
-        <Img src={HeroImg} alt="heroImage"/>
+        <Img src={HeroImg} alt="heroImage" />
       </AnimatedSection>
-      <AnimatedSection 
+      <AnimatedSection
         style={{
           alignItems: 'center',
         }}
@@ -84,7 +103,7 @@ function Home() {
         <Title>Shop by Categories</Title>
         <CardWrapper>
           {category.map((category) => (
-            <ProductCategoryCard key={category.id} category={category} />
+            <ProductCategoryCard category={category} />
           ))}
         </CardWrapper>
       </AnimatedSection>
@@ -96,10 +115,9 @@ function Home() {
       >
         <Title center>Our Bestseller</Title>
         <CardWrapper>
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          {products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
         </CardWrapper>
       </AnimatedSection>
     </Container>

@@ -27,9 +27,9 @@ export const UserSignIn = async (data) => await API.post("/user/signin", data);
 
 //Products
 export const getAllProducts = async (filter) =>
-  await API.get(`/products?${filter}`);
+  await API.get(`/product?${filter}`);
 
-export const getProductDetails = async (id) => await API.get(`/products/${id}`);
+export const getProductDetails = async (id) => await API.get(`/product/${id}`);
 
 //Cart
 

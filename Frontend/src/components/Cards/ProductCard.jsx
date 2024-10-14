@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Rating from '@mui/material/Rating';
 import { useNavigate } from 'react-router-dom';
-import { circularProgressClasses } from '@mui/material';
 import { AddShoppingCartRounded, FavoriteRounded } from '@mui/icons-material';
 import { AddShoppingCartOutlined } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { addToFavourite, deleteFromFavourite,getFavourite , addToCart} from '../../api';
+import { useSelector } from 'react-redux';
+import { openSnackbar } from '../../Redux/reducer/snackbarSlice';
+import { FavoriteBorder } from '@mui/icons-material';
+import { CircularProgress } from '@mui/material';
+import { motion } from "framer-motion";
 
 const Image = styled.img`
   width: 100%;
@@ -147,36 +153,141 @@ const MenuItem = styled.div`
   justify-content: center;
   cursor: pointer;
 `
-function ProductCard() {
-    return (
-        <Card>
-            <Top>
-                <Image src="https://assets.myntassets.com/dpr_1.5,q_60,w_400,c_limit,fl_progressive/assets/images/24439364/2023/8/10/a157968c-bc17-4fa8-b805-31f930c47b381691681709790MenBlackSolidSlimFitFormalBlazer1.jpg"/>
-                <Menu>
-                  <MenuItem>
-                    <FavoriteRounded sx={{fontSize:" 20px" , color: 'red'}} />
-                  </MenuItem>
-                  <MenuItem>
-                    <AddShoppingCartOutlined sx={{fontSize: "20px", color: 'inherit'}} onClick={() => addCart(Product?.id)} />
-                  </MenuItem>
-                </Menu>
-                <Rate>
-                    <Rating value={3} sx={{fontSize: 14}} />
-                </Rate>
-            </Top>
-            <Details>
-                <Title>
-                    Title
-                </Title>
-                <Desc>
-                    Description
-                </Desc>
-                <Price>
-                    $1200  <Span> $1500</Span> <Percentage>20% off</Percentage>
-                </Price>
-            </Details>
-        </Card>
-    )
+function ProductCard({ product }) {
+  const dispatch = useDispatch();
+  const [favorite, setFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const navigate = useNavigate();
+  const addFavorite = async () => {
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await addToFavourite(token, { productId: product?._id })
+      .then((res) => {
+        setFavorite(true);
+        setFavoriteLoading(false);
+      })
+      .catch((err) => {
+        setFavoriteLoading(false);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const removeFavorite = async () => {
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await deleteFromFavourite(token, { productId: product?._id })
+      .then((res) => {
+        setFavorite(false);
+        setFavoriteLoading(false);
+      })
+      .catch((err) => {
+        setFavoriteLoading(false);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const addCart = async () => {
+    const token = localStorage.getItem("Urban-token");
+    await addToCart(token, { productId: product?._id, quantity: 1 })
+      .then((res) => {
+        navigate("/cart");
+      })
+      .catch((err) => {
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+  const checkFavourite = async () => {
+    setFavoriteLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    try {
+      const res = await getFavourite(token);
+      if (res.data && Array.isArray(res.data.favourites)) {
+        const isFavorite = res.data.favourites.some(
+          (favorite) => favorite._id === product?._id
+        );
+        setFavorite(isFavorite);
+      } else {
+        console.error("Unexpected response format:", res.data);
+        setFavorite(false);
+      }
+    } catch (err) {
+      console.error("Error checking favourite:", err);
+      dispatch(
+        openSnackbar({
+          message: err.message || "Error checking favourite status",
+          severity: "error",
+        })
+      );
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+  useEffect(() => {
+    checkFavourite();
+  }, [favorite]);
+  return (
+    <Card>
+      <Top>
+        <Image src={product?.img} />
+        <Menu>
+          <MenuItem
+            onClick={() => (favorite ? removeFavorite() : addFavorite())}
+          >
+            {favoriteLoading ? (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 0.5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <FavoriteRounded sx={{ fontSize: "20px", color: "red" }} />
+              </motion.div>
+            ) : (
+              <>
+                {favorite ? (
+                  <FavoriteRounded sx={{ fontSize: "20px", color: "red" }} />
+                ) : (
+                  <FavoriteBorder sx={{ fontSize: "20px" }} />
+                )}
+              </>
+            )}
+          </MenuItem>{" "}
+
+          <MenuItem onClick={() => addCart(product?.id)}>
+            <AddShoppingCartOutlined
+              sx={{ color: "inherit", fontSize: "20px" }}
+            />
+          </MenuItem>
+        </Menu>
+        <Rate>
+          <Rating value={3} sx={{ fontSize: 14 }} />
+        </Rate>
+      </Top>
+      <Details onClick={() => navigate(`/Shop/${product?._id}`)}>
+        <Title>
+          {product?.title}
+        </Title>
+        <Desc>
+          {product?.desc}
+        </Desc>
+        <Price>
+          ${product?.price?.org}  <Span> ${product?.price?.org}</Span> <Percentage>{product?.price?.off}% off</Percentage>
+        </Price>
+      </Details>
+    </Card>
+  )
 }
 
 export default ProductCard
