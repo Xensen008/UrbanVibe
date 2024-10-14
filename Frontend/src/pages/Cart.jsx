@@ -1,9 +1,13 @@
-import React from 'react'
-import styled from 'styled-components'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-
-
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import TextInput from "../components/TextInput";
+import Button from "../components/Button";
+import { addToCart, deleteFromCart, getCart, placeOrder } from "../api";
+import { useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { openSnackbar } from "../Redux/reducer/snackbarSlice";
+import { DeleteOutline } from "@mui/icons-material";
 // Styled components
 const Container = styled.div`
   padding: 2px 44px;
@@ -83,8 +87,8 @@ const Table = styled.div`
 const TableItem = styled.div`
 ${({ flex }) => flex && 'flex: 1;'}
 ${({ bold }) =>
-  bold &&
-  `
+    bold &&
+    `
   font-weight: 600;
   font-size: 17px;
 `}
@@ -181,105 +185,312 @@ const Delivery = styled.div`
 
 
 function Cart() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [buttonLoad, setButtonLoad] = useState(false);
+
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    firstName: "",
+    lastName: "",
+    emailAddress: "",
+    phoneNumber: "",
+    completeAddress: "",
+  });
+
+  const getProducts = async () => {
+    setLoading(true);
+    const token = localStorage.getItem("Urban-token");
+    await getCart(token).then((res) => {
+      setProducts(res.data);
+      setLoading(false);
+    });
+  };
+
+  const addCart = async (id) => {
+    const token = localStorage.getItem("Urban-token");
+    await addToCart(token, { productId: id, quantity: 1 })
+      .then((res) => {
+        setReload(!reload);
+      })
+      .catch((err) => {
+        setReload(!reload);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+
+  const removeCart = async (id, quantity, type) => {
+    const token = localStorage.getItem("Urban-token");
+    let qnt = quantity > 0 ? 1 : null;
+    if (type === "full") qnt = null;
+    await deleteFromCart(token, {
+      productId: id,
+      quantity: qnt,
+    })
+      .then((res) => {
+        setReload(!reload);
+      })
+      .catch((err) => {
+        setReload(!reload);
+        dispatch(
+          openSnackbar({
+            message: err.message,
+            severity: "error",
+          })
+        );
+      });
+  };
+
+  const calculateSubtotal = () => {
+    return products.reduce(
+      (total, item) => total + item.quantity * item?.product?.price?.org,
+      0
+    );
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, [reload]);
+
+  const convertAddressToString = (addressObj) => {
+    // Convert the address object to a string representation
+    return `${addressObj.firstName} ${addressObj.lastName}, ${addressObj.completeAddress}, ${addressObj.phoneNumber}, ${addressObj.emailAddress}`;
+  };
+
+  const PlaceOrder = async () => {
+    setButtonLoad(true);
+    try {
+      const isDeliveryDetailsFilled =
+        deliveryDetails.firstName &&
+        deliveryDetails.lastName &&
+        deliveryDetails.completeAddress &&
+        deliveryDetails.phoneNumber &&
+        deliveryDetails.emailAddress;
+
+      if (!isDeliveryDetailsFilled) {
+        // Show an error message or handle the situation where delivery details are incomplete
+        dispatch(
+          openSnackbar({
+            message: "Please fill in all required delivery details.",
+            severity: "error",
+          })
+        );
+        return;
+      }
+      const token = localStorage.getItem("Urban-token");
+      const totalAmount = calculateSubtotal().toFixed(2);
+      const orderDetails = {
+        products,
+        address: convertAddressToString(deliveryDetails),
+        totalAmount,
+      };
+
+      await placeOrder(token, orderDetails);
+
+      // Show success message or navigate to a success page
+      dispatch(
+        openSnackbar({
+          message: "Order placed successfully",
+          severity: "success",
+        })
+      );
+      setButtonLoad(false);
+      // Clear the cart and update the UI
+      setReload(!reload);
+    } catch (error) {
+      // Handle errors, show error message, etc.
+      dispatch(
+        openSnackbar({
+          message: "Failed to place order. Please try again.",
+          severity: "error",
+        })
+      );
+      setButtonLoad(false);
+    }
+  };
   return (
     <Container>
-      <Section>
-        <Title>Your Shopping Cart</Title>
-        <Wrapper>
-          <Left>
-            <Table>
-              <TableItem bold flex >Product</TableItem>
-              <TableItem bold>Price</TableItem>
-              <TableItem bold>Quantity</TableItem>
-              <TableItem bold>Total</TableItem>
-            </Table>
-            <Table>
-              <TableItem flex >
-                <Product>
-                  <Img src="https://imgs.search.brave.com/TrXeyDd0RYEa0b-z2DYAilCj0KHMzFrFoQCYCZGDuT4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDU5/MjI4MDkxL3Bob3Rv/L2R1cmV4LWNvbmRv/bXMuanBnP3M9NjEy/eDYxMiZ3PTAmaz0y/MCZjPWR3LXhkeXVx/VWpuTG1PcWFFV2Zs/UnpIT2VJc1FoVkdN/UEtJc1RBaUZfSDQ9" />
-                  <Details>
-                  <ProTitle>Condom</ProTitle>
-                  <ProSize>Size: M</ProSize>
-                  <ProDesc>Lorem ipsum dolor sit amet</ProDesc>
-                  </Details>
-                </Product>
-              </TableItem> 
-              <TableItem >$30</TableItem>
-              <TableItem >
-                <Counter>
-                  <div>-</div>2<div>+</div>
-                </Counter>  
-              </TableItem>
-              <TableItem >$60</TableItem>
-            </Table>
-            <Table>
-              <TableItem flex >
-                <Product>
-                  <Img src="https://imgs.search.brave.com/TrXeyDd0RYEa0b-z2DYAilCj0KHMzFrFoQCYCZGDuT4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDU5/MjI4MDkxL3Bob3Rv/L2R1cmV4LWNvbmRv/bXMuanBnP3M9NjEy/eDYxMiZ3PTAmaz0y/MCZjPWR3LXhkeXVx/VWpuTG1PcWFFV2Zs/UnpIT2VJc1FoVkdN/UEtJc1RBaUZfSDQ9" />
-                  <Details>
-                  <ProTitle>Condom</ProTitle>
-                  <ProSize>Size: M</ProSize>
-                  <ProDesc>Lorem ipsum dolor sit amet</ProDesc>
-                  </Details>
-                </Product>
-              </TableItem> 
-              <TableItem >$30</TableItem>
-              <TableItem >
-                <Counter>
-                  <div>-</div>2<div>+</div>
-                </Counter>  
-              </TableItem>
-              <TableItem >$60</TableItem>
-            </Table>
-            <Table>
-              <TableItem flex >
-                <Product>
-                  <Img src="https://imgs.search.brave.com/TrXeyDd0RYEa0b-z2DYAilCj0KHMzFrFoQCYCZGDuT4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDU5/MjI4MDkxL3Bob3Rv/L2R1cmV4LWNvbmRv/bXMuanBnP3M9NjEy/eDYxMiZ3PTAmaz0y/MCZjPWR3LXhkeXVx/VWpuTG1PcWFFV2Zs/UnpIT2VJc1FoVkdN/UEtJc1RBaUZfSDQ9" />
-                  <Details>
-                  <ProTitle>Condom</ProTitle>
-                  <ProSize>Size: M</ProSize>
-                  <ProDesc>Lorem ipsum dolor sit amet</ProDesc>
-                  </Details>
-                </Product>
-              </TableItem> 
-              <TableItem >$30</TableItem>
-              <TableItem >
-                <Counter>
-                  <div>-</div>2<div>+</div>
-                </Counter>  
-              </TableItem>
-              <TableItem >$60</TableItem>
-            </Table>
-          </Left>
-          <Right>
-          <Subtotal>Subtotal : $50</Subtotal>
-          <Delivery>Payment Details
-            <div>
-            <TextInput small placeholder='Card Number'/>
-              <div style={{display: 'flex', gap: '10px'}}>
-                <TextInput small placeholder='Exp date'/>
-                <TextInput small placeholder='CVV'/>
-              </div>
-             
-              <TextInput small placeholder='Card Holder Name'/>
-            </div>
-          </Delivery>
-          <Delivery>Delivery Details
-            <div>
-              <div style={{display: 'flex', gap: '10px'}}>
-                <TextInput small placeholder='Enter your First Name'/>
-                <TextInput small placeholder='Enter your Last Name'/>
-              </div>
-              <TextInput small placeholder='Enter Email Address'/>
-              <TextInput small placeholder='Phone number +91 xxxxx xxxxx'/>
-              <TextInput small textArea row placeholder='Complete Address '/>
-            </div>
-          </Delivery>
-          
-            <Button small text="Place Order"/>
-          </Right>
-        </Wrapper>
-      </Section>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <Section>
+          <Title>Your Shopping Cart</Title>
+          {products.length === 0 ? (
+            <>Cart is empty</>
+          ) : (
+            <Wrapper>
+              <Left>
+                <Table>
+                  <TableItem bold flex >Product</TableItem>
+                  <TableItem bold>Price</TableItem>
+                  <TableItem bold>Quantity</TableItem>
+                  <TableItem bold>Total</TableItem>
+                </Table>
+                {products?.map((item) => (
+                  <Table>
+                    <TableItem flex >
+                      <Product>
+                        <Img src={item?.product?.img} />
+                        <Details>
+                          <ProTitle>{item?.product?.title}</ProTitle>
+                          <ProDesc>{item?.product?.name}</ProDesc>
+                          <ProSize>Size: Xl</ProSize>
+                        </Details>
+                      </Product>
+                    </TableItem>
+                    <TableItem >${item?.product?.price?.org}</TableItem>
+                    <TableItem >
+                    <Counter>
+                        <div
+                          style={{
+                            cursor: "pointer",
+                            flex: 1,
+                          }}
+                          onClick={() =>
+                            removeCart(item?.product?._id, item?.quantity - 1)
+                          }
+                        >
+                          -
+                        </div>
+                        {item?.quantity}
+                        <div
+                          style={{
+                            cursor: "pointer",
+                            flex: 1,
+                          }}
+                          onClick={() => addCart(item?.product?._id)}
+                        >
+                          +
+                        </div>
+                      </Counter>
+                    </TableItem>
+                    <TableItem>
+                      {" "}
+                      ${(item.quantity * item?.product?.price?.org).toFixed(2)}
+                    </TableItem>
+                    <TableItem>
+                      <DeleteOutline
+                        sx={{ color: "red" }}
+                        onClick={() =>
+                          removeCart(
+                            item?.product?._id,
+                            item?.quantity - 1,
+                            "full"
+                          )
+                        }
+                      />
+                    </TableItem>
+                  </Table>
+                ))}
+              </Left>
+              <Right>
+              <Subtotal>
+                  Subtotal : ${calculateSubtotal().toFixed(2)}
+                </Subtotal>
+                <Delivery>
+                  Payment Details:
+                  <div>
+                    <TextInput small placeholder="Card Number" />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                      }}
+                    >
+                      <TextInput small placeholder="Expiry Date" />
+                      <TextInput small placeholder="CVV" />
+                    </div>
+                    <TextInput small placeholder="Card Holder name" />
+                  </div>
+                </Delivery>
+                <Delivery>
+                  Delivery Details:
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                      }}
+                    >
+                      <TextInput
+                        small
+                        placeholder="First Name"
+                        value={deliveryDetails.firstName}
+                        handelChange={(e) =>
+                          setDeliveryDetails({
+                            ...deliveryDetails,
+                            firstName: e.target.value,
+                          })
+                        }
+                      />
+                      <TextInput
+                        small
+                        placeholder="Last Name"
+                        value={deliveryDetails.lastName}
+                        handelChange={(e) =>
+                          setDeliveryDetails({
+                            ...deliveryDetails,
+                            lastName: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <TextInput
+                      small
+                      value={deliveryDetails.emailAddress}
+                      handelChange={(e) =>
+                        setDeliveryDetails({
+                          ...deliveryDetails,
+                          emailAddress: e.target.value,
+                        })
+                      }
+                      placeholder="Email Address"
+                    />
+                    <TextInput
+                      small
+                      value={deliveryDetails.phoneNumber}
+                      handelChange={(e) =>
+                        setDeliveryDetails({
+                          ...deliveryDetails,
+                          phoneNumber: e.target.value,
+                        })
+                      }
+                      placeholder="Phone no. +91 XXXXX XXXXX"
+                    />
+                    <TextInput
+                      small
+                      textArea
+                      rows="4"
+                      handelChange={(e) =>
+                        setDeliveryDetails({
+                          ...deliveryDetails,
+                          completeAddress: e.target.value,
+                        })
+                      }
+                      value={deliveryDetails.completeAddress}
+                      placeholder="Complete Address (Address, State, Country, Pincode)"
+                    />
+                  </div>
+                </Delivery>
+                <Button
+                  text="Place Order"
+                  small
+                  isLoading={buttonLoad}
+                  iddisabled={buttonLoad}
+                  onClick={PlaceOrder}
+                />
+              </Right>
+            </Wrapper>
+          )}
+        </Section>
+      )}
     </Container>
   )
 }
