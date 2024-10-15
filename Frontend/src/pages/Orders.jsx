@@ -92,8 +92,8 @@ const OrderTotal = styled.span`
 const StatusBadge = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme, status }) => status === 'cancelled' ? theme.error : theme.success};
-  background-color: ${({ theme, status }) => status === 'cancelled' ? theme.error + '22' : theme.success + '22'};
+  color: ${({ status }) => status === 'cancelled' ? '#FF0000' : '#008000'};
+  background-color: ${({ status }) => status === 'cancelled' ? '#FF000022' : '#00800022'};
   padding: 6px 12px;
   border-radius: 20px;
   display: inline-block;
