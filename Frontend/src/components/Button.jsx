@@ -8,7 +8,7 @@ const ButtonContainer = styled.button`
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
-  color: ${({ theme }) => theme.text_primary};
+  color: white;
   border: 1.8px solid ${({ theme }) => theme.primary};
   border-radius: 12px;
   background-color: ${({ theme }) => theme.primary};
