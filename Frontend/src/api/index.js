@@ -77,9 +77,15 @@ export const getOrders = async (token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const cancelOrder = async (token, orderId) =>
-  await API.patch(`/user/order`, { orderId }, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  export const markOrderAsDelivered = async (token, orderId) =>
+    await API.patch(`/user/order/deliver`, { orderId }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  
+  // Update the existing cancelOrder function to use the new route
+  export const cancelOrder = async (token, orderId) =>
+    await API.patch(`/user/order/cancel`, { orderId }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
   

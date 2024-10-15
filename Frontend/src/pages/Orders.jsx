@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
-import { getOrders, cancelOrder } from '../api';
+import { getOrders, cancelOrder, markOrderAsDelivered } from '../api';
 import { openSnackbar } from '../Redux/reducer/snackbarSlice';
 
 const Container = styled.div`
@@ -92,8 +92,16 @@ const OrderTotal = styled.span`
 const StatusBadge = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ status }) => status === 'cancelled' ? '#FF0000' : '#008000'};
-  background-color: ${({ status }) => status === 'cancelled' ? '#FF000022' : '#00800022'};
+  color: ${({ theme, $status }) =>
+    $status === 'Cancelled' ? '#FFFFFF' :
+      $status === 'Delivered' ? '#FFFFFF' :
+        '#806600'  // Dark yellow for 'Payment Done'
+  };
+  background-color: ${({ theme, $status }) =>
+    $status === 'Cancelled' ? '#FF0000' :
+      $status === 'Delivered' ? '#008000' :
+        '#FFFAE6'  // Light yellow for 'Payment Done'
+  };
   padding: 6px 12px;
   border-radius: 20px;
   display: inline-block;
@@ -117,7 +125,8 @@ const Button = styled.button`
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
   transition: all 0.3s ease;
 `;
 
@@ -153,7 +162,7 @@ const ReplaceButton = styled(Button)`
 
 const ProductInfo = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 16px;
   margin-top: 16px;
 
@@ -162,6 +171,12 @@ const ProductInfo = styled.div`
     grid-row: 2 / 3;
     margin-top: 0;
   }
+`;
+
+const ProductItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
 `;
 
 const ProductImage = styled.img`
@@ -220,9 +235,11 @@ function Orders() {
   const handleCancelOrder = async (orderId) => {
     try {
       const token = localStorage.getItem("Urban-token");
-      await cancelOrder(token, orderId);
-      setOrders(prevOrders => prevOrders.map(order => 
-        order._id === orderId ? {...order, status: "cancelled"} : order
+      console.log("Cancelling order:", orderId);
+      const response = await cancelOrder(token, orderId);
+      console.log("Cancel order response:", response);
+      setOrders(prevOrders => prevOrders.map(order =>
+        order._id === orderId ? { ...order, status: "Cancelled" } : order
       ));
       dispatch(openSnackbar({
         message: "Order cancelled successfully",
@@ -232,6 +249,26 @@ function Orders() {
       console.error("Error cancelling order:", error);
       dispatch(openSnackbar({
         message: "Failed to cancel order",
+        severity: "error",
+      }));
+    }
+  };
+
+  const handleMarkAsDelivered = async (orderId) => {
+    try {
+      const token = localStorage.getItem("Urban-token");
+      await markOrderAsDelivered(token, orderId);
+      setOrders(prevOrders => prevOrders.map(order =>
+        order._id === orderId ? { ...order, status: "Delivered" } : order
+      ));
+      dispatch(openSnackbar({
+        message: "Order marked as delivered successfully",
+        severity: "success",
+      }));
+    } catch (error) {
+      console.error("Error marking order as delivered:", error);
+      dispatch(openSnackbar({
+        message: "Failed to mark order as delivered",
         severity: "error",
       }));
     }
@@ -257,30 +294,35 @@ function Orders() {
                     <OrderDate>Placed on: {new Date(order.createdAt).toLocaleDateString()}</OrderDate>
                     <OrderTotal>Total: ${order.total_amount ? parseFloat(order.total_amount.$numberDecimal).toFixed(2) : 'N/A'}</OrderTotal>
                   </OrderInfo>
-                  <StatusBadge status={order.status}>
-                    {order.status === 'cancelled' ? "Cancelled" : "Payment Done"}
+                  <StatusBadge $status={order.status}>
+                    {order.status}
                   </StatusBadge>
                 </OrderHeader>
                 <ButtonContainer>
-                  <CancelButton 
-                    disabled={order.status === 'cancelled'}
+                  <CancelButton
                     onClick={() => handleCancelOrder(order._id)}
+                    disabled={order.status !== 'Payment Done'}
                   >
                     Cancel Order
                   </CancelButton>
-                  <ReplaceButton disabled={order.status === 'cancelled'}>
-                    Replace Order
+                  <ReplaceButton
+                    onClick={() => handleMarkAsDelivered(order._id)}
+                    disabled={order.status !== 'Payment Done'}
+                  >
+                    Mark as Delivered
                   </ReplaceButton>
                 </ButtonContainer>
-                {order.products.map((item) => (
-                  <ProductInfo key={item._id}>
-                    <ProductImage src={item.product.img} alt={item.product.name} />
-                    <ProductDetails>
-                      <ProductName>{item.product.name}</ProductName>
-                      <ProductQuantity>Quantity: {item.quantity}</ProductQuantity>
-                    </ProductDetails>
-                  </ProductInfo>
-                ))}
+                <ProductInfo>
+                  {order.products.map((item) => (
+                    <ProductItem key={item._id}>
+                      <ProductImage src={item.product.img} alt={item.product.name} />
+                      <ProductDetails>
+                        <ProductName>{item.product.name}</ProductName>
+                        <ProductQuantity>Quantity: {item.quantity}</ProductQuantity>
+                      </ProductDetails>
+                    </ProductItem>
+                  ))}
+                </ProductInfo>
               </OrderItem>
             ))}
           </OrderList>

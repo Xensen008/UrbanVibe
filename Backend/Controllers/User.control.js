@@ -152,6 +152,25 @@ export const placeOrder = async (req, res, next) => {
 };
 
 
+export const markOrderAsDelivered = async (req, res, next) => {
+  try {
+    const { orderId } = req.body;
+    const order = await Orders.findById(orderId);
+    if (!order) return next(createError(404, "Order not found"));
+    
+    if (order.status === 'Cancelled') {
+      return next(createError(400, "Cannot mark a cancelled order as delivered"));
+    }
+    
+    order.status = "Delivered";
+    await order.save();
+    res.status(200).json({ message: "Order marked as delivered successfully", order });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Update the getAllOrders function to include the new status
 export const getAllOrders = async (req, res, next) => {
   try {
     const user = req.user;
@@ -173,12 +192,18 @@ export const getAllOrders = async (req, res, next) => {
 export const cancelOrder = async (req, res, next) => {
   try {
     const { orderId } = req.body;
+    console.log("Cancelling order:", orderId);
     const order = await Orders.findById(orderId);
-    if(!order) return next(createError(404, "Order not found"));
-    order.status = "cancelled";
+    if(!order) {
+      console.log("Order not found:", orderId);
+      return next(createError(404, "Order not found"));
+    }
+    order.status = "Cancelled";
     await order.save();
+    console.log("Order cancelled successfully:", order);
     res.status(200).json({ message: "Order cancelled successfully", order });
   } catch (error) {
+    console.error("Error cancelling order:", error);
     next(error);
   }
 }

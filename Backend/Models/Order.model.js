@@ -26,6 +26,7 @@ const OrdersSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ['Payment Done', 'Cancelled', 'Delivered'],
       default: "Payment Done",
     },
   },

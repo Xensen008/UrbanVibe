@@ -10,6 +10,7 @@ import {
   getUserFavourite, 
   placeOrder,
   removeFromCart,
+  markOrderAsDelivered,
   removeFromFavourite, 
 } from "../Controllers/User.control.js";
 import { verifyToken } from "../middleware/verifyToken.js";
@@ -26,7 +27,8 @@ router.patch("/cart", verifyToken, removeFromCart);
 //order
 router.get("/order", verifyToken, getAllOrders);
 router.post("/order", verifyToken, placeOrder);
-router.patch("/order", verifyToken, cancelOrder);
+router.patch("/order/cancel", verifyToken, cancelOrder);
+router.patch("/order/deliver", verifyToken, markOrderAsDelivered);
 
 //favourites
 router.get("/favorite", verifyToken, getUserFavourite);
