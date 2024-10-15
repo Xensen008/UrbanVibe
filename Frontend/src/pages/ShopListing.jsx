@@ -3,7 +3,9 @@ import ProductCard from "../components/cards/ProductCard";
 import styled from "styled-components";
 import { category, filter } from "../utils/data";
 import { CircularProgress, Slider } from "@mui/material";
-// import { getAllProducts } from "../api";
+import { getAllProducts } from "../api";
+import { Button } from "@mui/material";
+
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -89,44 +91,52 @@ const SelectableItem = styled.div`
   font-weight: 500;
   `}
 `;
+const ResetButton = styled(Button)`
+  margin-top: 16px;
+`;
 
 const ShopListing = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]); // Default selected sizes
-  const [selectedCategories, setSelectedCategories] = useState([
-    "Men",
-    "Women",
-    "Kids",
-    "Bags",
-  ]); // Default selected categories
-
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const getFilteredProductsData = async () => {
     setLoading(true);
-    // Call the API function for filtered products
-    // Commented out API call
-    /*
-    await getAllProducts(
-      `minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}${
-        selectedSizes.length > 0 ? `&sizes=${selectedSizes.join(",")}` : ""
-      }${
-        selectedCategories.length > 0
-          ? `&categories=${selectedCategories.join(",")}`
-          : ""
-      }`
-    ).then((res) => {
-      setProducts(res.data);
-      setLoading(false);
-    });
-    */
-    // Simulating API call with setTimeout
-    setTimeout(() => {
-      setProducts([]);  // Set to empty array for now
-      setLoading(false);
-    }, 1000);
-  };
+    try {
+      let queryString = '';
+      if (priceRange[0] !== 0 || priceRange[1] !== 1000) {
+        queryString += `minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`;
+      }
+      if (selectedSizes.length > 0 && selectedSizes.length < 5) {
+        queryString += `&sizes=${selectedSizes.join(",")}`;
+      }
 
+      // Add categories only if some are selected
+      if (selectedCategories.length > 0 && selectedCategories.length < 7) {
+        queryString += `&categories=${selectedCategories.join(",")}`;
+      }
+
+      console.log("API query string:", queryString);
+      const res = await getAllProducts(queryString);
+      console.log("API response:", res);
+      setProducts(res.data);
+      console.log("Products after setting state:", res.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  const resetFilters = () => {
+    setPriceRange([0, 1000]);
+    setSelectedSizes([]);
+    setSelectedCategories([]);
+  };
   useEffect(() => {
     getFilteredProductsData();
   }, [priceRange, selectedSizes, selectedCategories]);
@@ -138,14 +148,14 @@ const ShopListing = () => {
         <>
           <Filters>
             <Menu>
-              {filter.map((filters) => (
-                <FilterSection>
+              {filter.map((filters, index) => (
+                <FilterSection key={`filter-${index}`}>
                   <Title>{filters.name}</Title>
                   {filters.value === "price" ? (
                     <>
                       <Slider
-                        aria-label="Price"
-                        defaultValue={priceRange}
+                        getAriaLabel={() => 'Price range'}
+                        value={priceRange}
                         min={0}
                         max={1000}
                         valueLabelDisplay="auto"
@@ -166,7 +176,7 @@ const ShopListing = () => {
                             setSelectedSizes((prevSizes) =>
                               prevSizes.includes(item)
                                 ? prevSizes.filter(
-                                    (category) => category !== item
+                                    (size) => size !== item
                                   )
                                 : [...prevSizes, item]
                             )
@@ -178,9 +188,9 @@ const ShopListing = () => {
                     </Item>
                   ) : filters.value === "category" ? (
                     <Item>
-                      {filters.items.map((item, index) => (
+                      {filters.items.map((item) => (
                         <SelectableItem
-                          key={`${filters.value}-${item}-${index}`}
+                          key={item}
                           selected={selectedCategories.includes(item)}
                           onClick={() =>
                             setSelectedCategories((prevCategories) =>
@@ -199,10 +209,14 @@ const ShopListing = () => {
                   ) : null}
                 </FilterSection>
               ))}
+              <ResetButton variant="outlined" onClick={resetFilters}>
+                Reset Filters
+              </ResetButton>
             </Menu>
           </Filters>
           <Products>
             <CardWrapper>
+              {/* {console.log("Products in render:", products)} */}
               {products?.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}

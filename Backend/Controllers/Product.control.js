@@ -10,8 +10,8 @@ export const addProduct = async (req, res, next) => {
         }
         const createdProducts = []
         for (const productInfo of productData) {
-            const { title, name, desc ,img , prize , sizes, category } = productInfo;
-            const newProduct = new Product({ title, name, desc ,img , prize , sizes, category });
+            const { title, name, desc, img, price, sizes, category } = productInfo;
+            const newProduct = new Product({ title, name, desc, img, price: { org: price }, sizes, category });
             const savedProduct = await newProduct.save();
             createdProducts.push(savedProduct);
         }
@@ -25,20 +25,16 @@ export const addProduct = async (req, res, next) => {
 export const getproducts = async (req, res, next) => {
     try {
         const { categories, minPrice, maxPrice, sizes, search } = req.query;
-        const filter = {};
+        let filter = {};
 
         if (categories) {
-            filter.categories = { $in: categories.split(",") };
+            filter.category = { $in: categories.split(",") };
         }
 
         if (minPrice || maxPrice) {
             filter["price.org"] = {};
-            if (minPrice) {
-                filter["price.org"]["$gte"] = parseFloat(minPrice);
-            }
-            if (maxPrice) {
-                filter["price.org"]["$lte"] = parseFloat(maxPrice);
-            }
+            if (minPrice) filter["price.org"].$gte = parseFloat(minPrice);
+            if (maxPrice) filter["price.org"].$lte = parseFloat(maxPrice);
         }
 
         if (sizes) {
@@ -55,6 +51,7 @@ export const getproducts = async (req, res, next) => {
         const products = await Product.find(filter);
         res.status(200).json(products);
     } catch (error) {
+        console.error("Backend error:", error);
         next(error);
     }
 };
