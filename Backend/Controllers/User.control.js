@@ -142,6 +142,8 @@ export const placeOrder = async (req, res, next) => {
     });
     await order.save();
 
+    // Add the order to the user's orders array
+    user.orders.push(order._id);
     user.cart = [];
     await user.save();
 
@@ -174,13 +176,15 @@ export const markOrderAsDelivered = async (req, res, next) => {
 export const getAllOrders = async (req, res, next) => {
   try {
     const user = req.user;
-    const orders = await Orders.find({ user: user.id })
-      .populate({
+    const populatedUser = await User.findById(user.id).populate({
+      path: 'orders',
+      populate: {
         path: 'products.product',
         model: 'Products',
         select: 'name img price'
-      })
-      .sort({ createdAt: -1 });
+      }
+    });
+    const orders = populatedUser.orders.sort((a, b) => b.createdAt - a.createdAt);
     return res.status(200).json(orders);
   } catch (err) {
     next(err);
