@@ -155,7 +155,13 @@ export const placeOrder = async (req, res, next) => {
 export const getAllOrders = async (req, res, next) => {
   try {
     const user = req.user;
-    const orders = await Orders.find({ user: user.id });
+    const orders = await Orders.find({ user: user.id })
+      .populate({
+        path: 'products.product',
+        model: 'Products',
+        select: 'name img price'
+      })
+      .sort({ createdAt: -1 });
     return res.status(200).json(orders);
   } catch (err) {
     next(err);

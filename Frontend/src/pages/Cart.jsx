@@ -287,14 +287,16 @@ function Cart() {
       const token = localStorage.getItem("Urban-token");
       const totalAmount = calculateSubtotal().toFixed(2);
       const orderDetails = {
-        products,
+        products: products.map(item => ({
+          product: item.product._id,
+          quantity: item.quantity
+        })),
         address: convertAddressToString(deliveryDetails),
         totalAmount,
       };
-
+  
       await placeOrder(token, orderDetails);
-
-      // Show success message or navigate to a success page
+  
       dispatch(
         openSnackbar({
           message: "Order placed successfully",
@@ -302,10 +304,9 @@ function Cart() {
         })
       );
       setButtonLoad(false);
-      // Clear the cart and update the UI
       setReload(!reload);
+      navigate("/orders"); // Redirect to the Orders page
     } catch (error) {
-      // Handle errors, show error message, etc.
       dispatch(
         openSnackbar({
           message: "Failed to place order. Please try again.",

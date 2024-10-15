@@ -1,7 +1,9 @@
-import React from 'react'
-import styled from 'styled-components'
-import { motion } from 'framer-motion'
-import { Star } from '@styled-icons/feather/Star'
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { useDispatch } from 'react-redux';
+import { getOrders, cancelOrder } from '../api';
+import { openSnackbar } from '../Redux/reducer/snackbarSlice';
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -46,7 +48,7 @@ const OrderItem = styled.div`
 
   @media (min-width: 768px) {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
     grid-template-rows: auto auto;
     gap: 20px;
     align-items: center;
@@ -90,45 +92,11 @@ const OrderTotal = styled.span`
 const StatusBadge = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${getStatusColor};
-  background-color: ${getStatusBgColor};
+  color: ${({ theme, cancelled }) => cancelled ? theme.error : theme.success};
+  background-color: ${({ theme, cancelled }) => cancelled ? theme.error + '22' : theme.success + '22'};
   padding: 6px 12px;
   border-radius: 20px;
   display: inline-block;
-`;
-
-const ProgressContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-
-  @media (min-width: 768px) {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-  }
-`;
-
-const ProgressBar = styled.div`
-  flex: 1;
-  height: 8px;
-  background-color: ${({ theme }) => theme.bg};
-  border-radius: 4px;
-  overflow: hidden;
-`;
-
-const Progress = styled.div`
-  width: ${({ progress }) => progress}%;
-  height: 100%;
-  background-color: ${getStatusColor};
-  transition: width 0.3s ease;
-`;
-
-const ProgressText = styled.span`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text_primary};
-  min-width: 45px;
-  text-align: right;
 `;
 
 const ButtonContainer = styled.div`
@@ -137,9 +105,10 @@ const ButtonContainer = styled.div`
   margin-top: 16px;
 
   @media (min-width: 768px) {
-    grid-column: 3 / 4;
+    grid-column: 2 / 3;
     grid-row: 1 / 2;
     margin-top: 0;
+    justify-content: flex-end;
   }
 `;
 
@@ -147,14 +116,9 @@ const Button = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 `;
 
 const CancelButton = styled(Button)`
@@ -162,18 +126,28 @@ const CancelButton = styled(Button)`
   color: ${({ theme }) => theme.text_primary};
   border: 1px solid ${({ theme }) => theme.text_secondary};
 
-  &:hover:not(:disabled) {
-    background-color: ${({ theme }) => theme.text_secondary + '20'};
+  &:hover {
+    background-color: ${({ theme }) => theme.text_secondary + '22'};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
 const ReplaceButton = styled(Button)`
   background-color: ${({ theme }) => theme.primary};
-  color: white;
+  color: ${({ theme }) => theme.text_primary};
   border: none;
 
-  &:hover:not(:disabled) {
+  &:hover {
     background-color: ${({ theme }) => theme.primary + 'dd'};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -200,64 +174,67 @@ const ProductImage = styled.img`
 const ProductDetails = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
 `;
 
 const ProductName = styled.span`
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   color: ${({ theme }) => theme.text_primary};
 `;
 
-const RatingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-const StarIcon = styled(Star)`
-  width: 16px;
-  height: 16px;
-  color: #ffc107;
-`;
-
-const Rating = styled.span`
+const ProductQuantity = styled.span`
   font-size: 14px;
   color: ${({ theme }) => theme.text_secondary};
 `;
 
-function getStatusColor({ status }) {
-  switch (status) {
-    case 'Processing': return '#FFA500';
-    case 'Shipped': return '#3498db';
-    case 'Delivered': return '#2ecc71';
-    case 'Cancelled': return '#e74c3c';
-    default: return '#95a5a6';
-  }
-}
-
-function getStatusBgColor({ status }) {
-  switch (status) {
-    case 'Processing': return '#FFF3E0';
-    case 'Shipped': return '#E3F2FD';
-    case 'Delivered': return '#E8F5E9';
-    case 'Cancelled': return '#FFEBEE';
-    default: return '#ECEFF1';
-  }
-}
-
 function Orders() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+
   const fadeInVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
-  const mockOrders = [
-    { id: '1234', date: '2023-05-15', status: 'Delivered', total: 120.99, progress: 100, productName: 'Wireless Headphones', rating: 4.5, image: 'https://imgs.search.brave.com/4szZIc7ys7OvFi8xoIH1ac-aEIOUcOKTx1PEUA-jwwA/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmRhbmEtZmFyYmVy/Lm9yZy9pbnNpZ2h0/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDE5/LzAzL21hbHRlLXdp/bmdlbi0zODIxNDgt/dW5zcGxhc2gtMS5q/cGc' },
-    { id: '5678', date: '2023-05-10', status: 'Shipped', total: 89.50, progress: 75, productName: 'Smart Watch', rating: 4.2, image: 'https://imgs.search.brave.com/4szZIc7ys7OvFi8xoIH1ac-aEIOUcOKTx1PEUA-jwwA/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmRhbmEtZmFyYmVy/Lm9yZy9pbnNpZ2h0/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDE5/LzAzL21hbHRlLXdp/bmdlbi0zODIxNDgt/dW5zcGxhc2gtMS5q/cGc' },
-    { id: '9101', date: '2023-05-05', status: 'Processing', total: 210.75, progress: 25, productName: 'Laptop', rating: 4.8, image: 'https://imgs.search.brave.com/4szZIc7ys7OvFi8xoIH1ac-aEIOUcOKTx1PEUA-jwwA/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmRhbmEtZmFyYmVy/Lm9yZy9pbnNpZ2h0/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDE5/LzAzL21hbHRlLXdp/bmdlbi0zODIxNDgt/dW5zcGxhc2gtMS5q/cGc' },
-    { id: '1112', date: '2023-05-01', status: 'Cancelled', total: 45.00, progress: 0, productName: 'Phone Case', rating: 3.9, image: 'https://imgs.search.brave.com/4szZIc7ys7OvFi8xoIH1ac-aEIOUcOKTx1PEUA-jwwA/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmRhbmEtZmFyYmVy/Lm9yZy9pbnNpZ2h0/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDE5/LzAzL21hbHRlLXdp/bmdlbi0zODIxNDgt/dW5zcGxhc2gtMS5q/cGc' },
-  ];
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("Urban-token");
+      const response = await getOrders(token);
+      setOrders(response.data);
+    } catch (error) {
+      dispatch(openSnackbar({
+        message: "Failed to fetch orders",
+        severity: "error",
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      const token = localStorage.getItem("Urban-token");
+      await cancelOrder(token, orderId);
+      setOrders(prevOrders => prevOrders.map(order => 
+        order._id === orderId ? {...order, cancelled: true} : order
+      ));
+      dispatch(openSnackbar({
+        message: "Order cancelled successfully",
+        severity: "success",
+      }));
+    } catch (error) {
+      dispatch(openSnackbar({
+        message: "Failed to cancel order",
+        severity: "error",
+      }));
+    }
+  };
 
   return (
     <Container>
@@ -267,47 +244,49 @@ function Orders() {
         variants={fadeInVariants}
       >
         <Title>Your Orders</Title>
-        <OrderList>
-          {mockOrders.map((order) => (
-            <OrderItem key={order.id}>
-              <OrderHeader>
-                <OrderInfo>
-                  <OrderId>Order #{order.id}</OrderId>
-                  <OrderDate>Placed on: {order.date}</OrderDate>
-                  <OrderTotal>Total: ${order.total.toFixed(2)}</OrderTotal>
-                </OrderInfo>
-                <StatusBadge status={order.status}>{order.status}</StatusBadge>
-              </OrderHeader>
-              <ProgressContainer>
-                <ProgressBar>
-                  <Progress progress={order.progress} status={order.status} />
-                </ProgressBar>
-                <ProgressText>{order.progress}%</ProgressText>
-              </ProgressContainer>
-              <ButtonContainer>
-                <CancelButton disabled={order.status === 'Delivered' || order.status === 'Cancelled'}>
-                  Cancel Order
-                </CancelButton>
-                <ReplaceButton disabled={order.status !== 'Delivered'}>
-                  Replace Order
-                </ReplaceButton>
-              </ButtonContainer>
-              <ProductInfo>
-                <ProductImage src={order.image} alt={order.productName} />
-                <ProductDetails>
-                  <ProductName>{order.productName}</ProductName>
-                  <RatingContainer>
-                    <StarIcon />
-                    <Rating>{order.rating.toFixed(1)}</Rating>
-                  </RatingContainer>
-                </ProductDetails>
-              </ProductInfo>
-            </OrderItem>
-          ))}
-        </OrderList>
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : (
+          <OrderList>
+            {orders.map((order) => (
+              <OrderItem key={order._id}>
+                <OrderHeader>
+                  <OrderInfo>
+                    <OrderId>Order #{order._id}</OrderId>
+                    <OrderDate>Placed on: {new Date(order.createdAt).toLocaleDateString()}</OrderDate>
+                    <OrderTotal>Total: ${order.total_amount ? parseFloat(order.total_amount.$numberDecimal).toFixed(2) : 'N/A'}</OrderTotal>
+                  </OrderInfo>
+                  <StatusBadge cancelled={order.cancelled}>
+                    {order.cancelled ? "Cancelled" : "Payment Done"}
+                  </StatusBadge>
+                </OrderHeader>
+                <ButtonContainer>
+                  <CancelButton 
+                    disabled={order.cancelled}
+                    onClick={() => handleCancelOrder(order._id)}
+                  >
+                    Cancel Order
+                  </CancelButton>
+                  <ReplaceButton disabled={order.cancelled}>
+                    Replace Order
+                  </ReplaceButton>
+                </ButtonContainer>
+                {order.products.map((item) => (
+                  <ProductInfo key={item._id}>
+                    <ProductImage src={item.product.img} alt={item.product.name} />
+                    <ProductDetails>
+                      <ProductName>{item.product.name}</ProductName>
+                      <ProductQuantity>Quantity: {item.quantity}</ProductQuantity>
+                    </ProductDetails>
+                  </ProductInfo>
+                ))}
+              </OrderItem>
+            ))}
+          </OrderList>
+        )}
       </Section>
     </Container>
-  )
+  );
 }
 
-export default Orders
+export default Orders;
