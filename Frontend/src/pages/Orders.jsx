@@ -92,8 +92,8 @@ const OrderTotal = styled.span`
 const StatusBadge = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme, cancelled }) => cancelled ? theme.error : theme.success};
-  background-color: ${({ theme, cancelled }) => cancelled ? theme.error + '22' : theme.success + '22'};
+  color: ${({ theme, status }) => status === 'cancelled' ? theme.error : theme.success};
+  background-color: ${({ theme, status }) => status === 'cancelled' ? theme.error + '22' : theme.success + '22'};
   padding: 6px 12px;
   border-radius: 20px;
   display: inline-block;
@@ -222,13 +222,14 @@ function Orders() {
       const token = localStorage.getItem("Urban-token");
       await cancelOrder(token, orderId);
       setOrders(prevOrders => prevOrders.map(order => 
-        order._id === orderId ? {...order, cancelled: true} : order
+        order._id === orderId ? {...order, status: "cancelled"} : order
       ));
       dispatch(openSnackbar({
         message: "Order cancelled successfully",
         severity: "success",
       }));
     } catch (error) {
+      console.error("Error cancelling order:", error);
       dispatch(openSnackbar({
         message: "Failed to cancel order",
         severity: "error",
@@ -256,18 +257,18 @@ function Orders() {
                     <OrderDate>Placed on: {new Date(order.createdAt).toLocaleDateString()}</OrderDate>
                     <OrderTotal>Total: ${order.total_amount ? parseFloat(order.total_amount.$numberDecimal).toFixed(2) : 'N/A'}</OrderTotal>
                   </OrderInfo>
-                  <StatusBadge cancelled={order.cancelled}>
-                    {order.cancelled ? "Cancelled" : "Payment Done"}
+                  <StatusBadge status={order.status}>
+                    {order.status === 'cancelled' ? "Cancelled" : "Payment Done"}
                   </StatusBadge>
                 </OrderHeader>
                 <ButtonContainer>
                   <CancelButton 
-                    disabled={order.cancelled}
+                    disabled={order.status === 'cancelled'}
                     onClick={() => handleCancelOrder(order._id)}
                   >
                     Cancel Order
                   </CancelButton>
-                  <ReplaceButton disabled={order.cancelled}>
+                  <ReplaceButton disabled={order.status === 'cancelled'}>
                     Replace Order
                   </ReplaceButton>
                 </ButtonContainer>

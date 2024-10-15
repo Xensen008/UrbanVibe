@@ -78,7 +78,7 @@ export const getOrders = async (token) =>
   });
 
 export const cancelOrder = async (token, orderId) =>
-  await API.patch(`/user/order/${orderId}`, {
+  await API.patch(`/user/order`, { orderId }, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
