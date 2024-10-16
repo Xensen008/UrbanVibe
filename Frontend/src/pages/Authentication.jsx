@@ -90,7 +90,7 @@ const TextButton = styled.div`
   transition: all 0.3s ease;
 `
 function Authentication({ openAuth, setOpenAuth }) {
-  const [login, setLogin] = React.useState(true)
+  const [login, setLogin] = React.useState(true);
   return (
     <Modal open={openAuth}>
       <Container>
@@ -100,21 +100,21 @@ function Authentication({ openAuth, setOpenAuth }) {
         </Left>
         <Right>
           <CloseButton>
-            <CloseIcon onClick={()=>setOpenAuth(false)} />
+            <CloseIcon onClick={() => setOpenAuth(false)} />
           </CloseButton>
           {login ? 
           <>
             <SignIn setOpenAuth={setOpenAuth}/>
-            <Text> Don't have an Account ?<TextButton onClick={()=>setLogin(false)}>Sign Up</TextButton></Text>
+            <Text>Don't have an Account? <TextButton onClick={() => setLogin(false)}>Sign Up</TextButton></Text>
           </> : 
           <>
             <SignUp setOpenAuth={setOpenAuth} setLogin={setLogin} />
-            <Text> Already have an account ?<TextButton onClick={()=>setLogin(true)}>Sign In</TextButton></Text>
-          </>}  
+            <Text>Already have an account? <TextButton onClick={() => setLogin(true)}>Sign In</TextButton></Text>
+          </>}
         </Right>
       </Container>
     </Modal>
-  )
+  );
 }
 
 export default Authentication

@@ -14,6 +14,7 @@ import ContactUs from "./pages/ContactUs";
 import ProductDetails from "./pages/ProductDetails";
 import { useSelector } from "react-redux";
 import ToastMsg from "./components/ToastMsg";
+import ProtectedRoute from "./components/Protection/ProtectedRoute";
 
 const Container = styled.div`
   width: 100%;
@@ -28,26 +29,54 @@ const Container = styled.div`
 `;
 
 function App() {
-  const {currentUser} = useSelector((state) => state.user);
-  const {open,message,severity} = useSelector((state) => state.snackbar);
+  const { currentUser } = useSelector((state) => state.user);
+  const { open, message, severity } = useSelector((state) => state.snackbar);
   const [openAuth, setOpenAuth] = React.useState(false);
+
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
         <Container>
-          <Navbar setOpenAuth={setOpenAuth} currentUser={currentUser} />
+          <Navbar openAuth={openAuth} setOpenAuth={setOpenAuth} currentUser={currentUser} />
           <Routes>
-            <Route path="/" exact element={<Home/>} />
-            <Route path="/Shop" exact element={<ShopListing/>} />
-            <Route path="/Wishlist" element={<Favourite/>} />
-            <Route path="/New-Arrival" element={<NewArrival/>} />
-            <Route path="/Contact-Us" element={<ContactUs/>} />
-            <Route path="/orders" element={<Orders/>} />
-            <Route path="/Cart" element={<Cart/>} />
-            <Route path="/Shop/:id" element={<ProductDetails/>} />
+            <Route path="/" exact element={<Home />} />
+            <Route path="/Shop" element={
+              <ProtectedRoute openAuth={openAuth} setOpenAuth={setOpenAuth}>
+                <ShopListing />
+              </ProtectedRoute>
+            } />
+            <Route path="/Wishlist" element={
+              <ProtectedRoute>
+                <Favourite />
+              </ProtectedRoute>
+            } />
+            <Route path="/New-Arrival" element={
+              <ProtectedRoute>
+                <NewArrival />
+              </ProtectedRoute>
+            } />
+            <Route path="/Contact-Us" element={
+              <ProtectedRoute>
+                <ContactUs />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            } />
+            <Route path="/Cart" element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            } />
+            <Route path="/Shop/:id" element={
+              <ProtectedRoute>
+                <ProductDetails />
+              </ProtectedRoute>
+            } />
           </Routes>
-          {openAuth && <Authentication openAuth={openAuth} setOpenAuth={setOpenAuth} />}
-
+          <Authentication openAuth={openAuth} setOpenAuth={setOpenAuth} />
           {open && <ToastMsg message={message} severity={severity} open={open} />}
         </Container>
       </BrowserRouter>
