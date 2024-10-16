@@ -9,7 +9,6 @@ import { addToFavourite, deleteFromFavourite,getFavourite , addToCart} from '../
 import { useSelector } from 'react-redux';
 import { openSnackbar } from '../../Redux/reducer/snackbarSlice';
 import { FavoriteBorder } from '@mui/icons-material';
-import { CircularProgress } from '@mui/material';
 import { motion } from "framer-motion";
 
 const Image = styled.img`
@@ -153,7 +152,7 @@ const MenuItem = styled.div`
   justify-content: center;
   cursor: pointer;
 `
-function ProductCard({ product }) {
+function ProductCard({ product, onFavoriteUpdate = () => {} }) {
   const dispatch = useDispatch();
   const [favorite, setFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
@@ -165,6 +164,7 @@ function ProductCard({ product }) {
       .then((res) => {
         setFavorite(true);
         setFavoriteLoading(false);
+        if (onFavoriteUpdate) onFavoriteUpdate();
       })
       .catch((err) => {
         setFavoriteLoading(false);
@@ -183,6 +183,7 @@ function ProductCard({ product }) {
       .then((res) => {
         setFavorite(false);
         setFavoriteLoading(false);
+        if (onFavoriteUpdate) onFavoriteUpdate();
       })
       .catch((err) => {
         setFavoriteLoading(false);

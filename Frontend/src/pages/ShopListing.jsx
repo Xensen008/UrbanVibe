@@ -117,11 +117,8 @@ const ShopListing = () => {
         queryString += `&categories=${selectedCategories.join(",")}`;
       }
 
-      console.log("API query string:", queryString);
       const res = await getAllProducts(queryString);
-      console.log("API response:", res);
       setProducts(res.data);
-      console.log("Products after setting state:", res.data);
     } catch (error) {
       console.error("Error fetching products:", error);
       if (error.response) {
@@ -216,7 +213,6 @@ const ShopListing = () => {
           </Filters>
           <Products>
             <CardWrapper>
-              {/* {console.log("Products in render:", products)} */}
               {products?.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
