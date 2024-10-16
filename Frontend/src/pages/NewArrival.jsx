@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import ProductCard from '../components/cards/ProductCard'
+import { getAllProducts } from '../api'
+import { useDispatch } from 'react-redux'
+import { openSnackbar } from '../Redux/reducer/snackbarSlice'
+import { CircularProgress } from '@mui/material'
+import { category } from '../utils/data'
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -80,28 +85,52 @@ const CardWrapper = styled.div`
   }
 `;
 
-const newArrivals = [
-  { id: 1, name: "Summer Breeze Dress", price: 79.99, category: "Dresses" },
-  { id: 2, name: "Urban Explorer Backpack", price: 129.99, category: "Accessories" },
-  { id: 3, name: "Sunset Glow Eyeshadow Palette", price: 45.99, category: "Beauty" },
-  { id: 4, name: "Eco-Friendly Water Bottle", price: 24.99, category: "Accessories" },
-  { id: 5, name: "Vintage Denim Jacket", price: 89.99, category: "Clothing" },
-  { id: 6, name: "Smart Fitness Watch", price: 199.99, category: "Electronics" },
-  { id: 7, name: "Boho Chic Maxi Skirt", price: 69.99, category: "Clothing" },
-  { id: 8, name: "Noise-Canceling Headphones", price: 249.99, category: "Electronics" },
-];
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px; // Adjust this value as needed
+`;
 
 function NewArrival() {
   const [filter, setFilter] = useState('All');
-  const [filteredProducts, setFilteredProducts] = useState(newArrivals);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllProducts();
+      const sortedProducts = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setProducts(sortedProducts);
+      setFilteredProducts(sortedProducts);
+    } catch (error) {
+      dispatch(openSnackbar({
+        message: "Failed to fetch products",
+        severity: "error",
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (filter === 'All') {
-      setFilteredProducts(newArrivals);
+      setFilteredProducts(products);
     } else {
-      setFilteredProducts(newArrivals.filter(product => product.category === filter));
+      setFilteredProducts(products.filter(product => 
+        Array.isArray(product.category) 
+          ? product.category.some(cat => cat.toLowerCase() === filter.toLowerCase())
+          : product.category.toLowerCase() === filter.toLowerCase()
+      ));
     }
-  }, [filter]);
+  }, [filter, products]);
 
   return (
     <Container>
@@ -119,33 +148,42 @@ function NewArrival() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {['All', 'Clothing', 'Accessories', 'Beauty', 'Electronics'].map((category) => (
+          <FilterButton
+            key="All"
+            active={filter === 'All'}
+            onClick={() => setFilter('All')}
+          >
+            All
+          </FilterButton>
+          {category.map((cat) => (
             <FilterButton
-              key={category}
-              active={filter === category}
-              onClick={() => setFilter(category)}
+              key={cat.name}
+              active={filter === cat.name}
+              onClick={() => setFilter(cat.name)}
             >
-              {category}
+              {cat.name}
             </FilterButton>
           ))}
         </FilterSection>
 
-        <CardWrapper>
-          {filteredProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * index }}
-            >
-              <ProductCard
-                name={product.name}
-                price={product.price}
-                category={product.category}
-              />
-            </motion.div>
-          ))}
-        </CardWrapper>
+        {loading ? (
+          <LoadingContainer>
+            <CircularProgress />
+          </LoadingContainer>
+        ) : (
+          <CardWrapper>
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 * index }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </CardWrapper>
+        )}
       </Content>
     </Container>
   )
