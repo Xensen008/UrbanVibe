@@ -26,6 +26,12 @@ const ModalContent = styled(motion.div)`
   max-width: 600px;
   padding: 20px;
   position: relative;
+
+  @media (max-width: 768px) {
+    width: 95%;
+    padding: 15px;
+    margin: 10px;
+  }
 `;
 
 const SearchContainer = styled(motion.div)`
@@ -34,6 +40,10 @@ const SearchContainer = styled(motion.div)`
   background: ${({ theme }) => theme.bg_light};
   border-radius: 30px;
   padding: 10px 20px;
+
+  @media (max-width: 768px) {
+    padding: 8px 15px;
+  }
 `;
 
 const SearchInput = styled.input`
@@ -44,6 +54,11 @@ const SearchInput = styled.input`
   color: ${({ theme }) => theme.text_primary};
   outline: none;
   padding: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: 8px;
+  }
 `;
 
 const SearchIcon = styled(SearchRounded)`
@@ -59,6 +74,10 @@ const ResultsContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
   padding: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
 `;
 
 const NoResults = styled.div`
