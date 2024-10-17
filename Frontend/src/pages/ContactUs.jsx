@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
+import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { openSnackbar } from '../Redux/reducer/snackbarSlice'
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -54,6 +57,48 @@ const InputGroup = styled.div`
 `;
 
 function ContactUs() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await axios.post('http://localhost:3000/api/send-email', formData);
+      dispatch(openSnackbar({
+        message: "Message sent successfully!",
+        severity: "success",
+      }));
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      dispatch(openSnackbar({
+        message: "Failed to send message. Please try again.",
+        severity: "error",
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fadeInVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
@@ -70,15 +115,15 @@ function ContactUs() {
         <Subtitle>
           Have a question or feedback? We'd love to hear from you. Fill out the form below and we'll get back to you as soon as possible.
         </Subtitle>
-        <Form>
+        <Form onSubmit={handleSubmit}>
           <InputGroup>
-            <TextInput label="First Name" placeholder="Enter your first name" />
-            <TextInput label="Last Name" placeholder="Enter your last name" />
+            <TextInput label="First Name" name="firstName" placeholder="Enter your first name" value={formData.firstName} handelChange={handleChange} />
+            <TextInput label="Last Name" name="lastName" placeholder="Enter your last name" value={formData.lastName} handelChange={handleChange} />
           </InputGroup>
-          <TextInput label="Email" placeholder="Enter your email address" type="email" />
-          <TextInput label="Subject" placeholder="What is this regarding?" />
-          <TextInput label="Message" placeholder="Your message here..." textArea rows={5} />
-          <Button text="Send Message" />
+          <TextInput label="Email" name="email" placeholder="Enter your email address" type="email" value={formData.email} handelChange={handleChange} />
+          <TextInput label="Subject" name="subject" placeholder="What is this regarding?" value={formData.subject} handelChange={handleChange} />
+          <TextInput label="Message" name="message" placeholder="Your message here..." textArea rows={5} value={formData.message} handelChange={handleChange} />
+          <Button text="Send Message" isLoading={loading} />
         </Form>
       </Section>
     </Container>

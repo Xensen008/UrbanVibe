@@ -5,6 +5,7 @@ dotenv.config();
 import mongoose from 'mongoose';
 import UserRoute from './Routes/User.route.js';
 import ProductRoute from './Routes/Product.route.js';
+import nodemailer from 'nodemailer';
 
 const dbUrl = process.env.DB_URL;
 const port = process.env.PORT || 3000;
@@ -34,6 +35,46 @@ app.get('/', (req, res) => {
 });
 app.use("/api/user", UserRoute);  
 app.use("/api/product", ProductRoute);
+
+// Email route
+app.post('/api/send-email', async (req, res) => {
+  const { firstName, lastName, email, subject, message } = req.body;
+
+  // Create a transporter using SMTP
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use TLS
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD
+    }
+  });
+
+  // Email content
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER, // Send to yourself
+    subject: `New Contact Form Submission: ${subject}`,
+    text: `
+      Name: ${firstName} ${lastName}
+      Email: ${email}
+      Subject: ${subject}
+      Message: ${message}
+    `
+  };
+
+  try {
+    // Send email
+    let info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Error sending email' });
+  }
+});
+
 //Connect to Database
 const connectToDatabase = async () => {
   try {
