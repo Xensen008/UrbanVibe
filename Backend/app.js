@@ -42,9 +42,7 @@ app.post('/api/send-email', async (req, res) => {
 
   // Create a transporter using SMTP
   let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // Use TLS
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_APP_PASSWORD
@@ -53,15 +51,22 @@ app.post('/api/send-email', async (req, res) => {
 
   // Email content
   let mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER, // Send to yourself
+    from: `"UrbanVibe Contact Form" <${process.env.EMAIL_USER}>`,
+    to: process.env.EMAIL_USER,
     subject: `New Contact Form Submission: ${subject}`,
     text: `
+      You've received a new message from the UrbanVibe contact form:
+
       Name: ${firstName} ${lastName}
       Email: ${email}
       Subject: ${subject}
-      Message: ${message}
-    `
+
+      Message:
+      ${message}
+
+      To reply, simply respond to this email or send a new email to ${email}.
+    `,
+    replyTo: email
   };
 
   try {
