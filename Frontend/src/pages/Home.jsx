@@ -57,7 +57,7 @@ const CardWrapper = styled.div`
   }
 
 `
-const AnimatedSection = motion(Section)
+const AnimatedSection = motion.create(Section)
 function Home() {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
@@ -102,8 +102,8 @@ function Home() {
       >
         <Title>Shop by Categories</Title>
         <CardWrapper>
-          {category.map((category) => (
-            <ProductCategoryCard category={category} />
+          {category.map((categoryItem) => (
+            <ProductCategoryCard key={categoryItem.name} category={categoryItem} />
           ))}
         </CardWrapper>
       </AnimatedSection>

@@ -45,9 +45,14 @@ function App() {
                 <ShopListing />
               </ProtectedRoute>
             } />
-            <Route path="/Shop/:category" element={
+            <Route path="/Shop/category/:category" element={
               <ProtectedRoute>
                 <ShopListing />
+              </ProtectedRoute>
+            } />
+            <Route path="/Shop/product/:id" element={
+              <ProtectedRoute>
+                <ProductDetails />
               </ProtectedRoute>
             } />
             <Route path="/Wishlist" element={
@@ -73,11 +78,6 @@ function App() {
             <Route path="/Cart" element={
               <ProtectedRoute>
                 <Cart />
-              </ProtectedRoute>
-            } />
-            <Route path="/Shop/:id" element={
-              <ProtectedRoute>
-                <ProductDetails />
               </ProtectedRoute>
             } />
           </Routes>

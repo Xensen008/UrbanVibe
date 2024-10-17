@@ -279,7 +279,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
           <Rating value={3} sx={{ fontSize: 14 }} />
         </Rate>
       </Top>
-      <Details onClick={() => navigate(`/Shop/${product?._id}`)}>
+      <Details onClick={() => navigate(`/Shop/product/${product._id}`)}>
         <Title>
           {product?.title}
         </Title>
