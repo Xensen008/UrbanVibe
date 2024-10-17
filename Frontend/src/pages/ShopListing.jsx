@@ -5,7 +5,7 @@ import { category, filter } from "../utils/data";
 import { CircularProgress, Slider } from "@mui/material";
 import { getAllProducts } from "../api";
 import { Button } from "@mui/material";
-
+import { useParams } from "react-router-dom";
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -96,11 +96,13 @@ const ResetButton = styled(Button)`
 `;
 
 const ShopListing = () => {
+  const { category } = useParams();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedSizes, setSelectedSizes] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(category ? [category] : []);
+
   const getFilteredProductsData = async () => {
     setLoading(true);
     try {
@@ -129,14 +131,23 @@ const ShopListing = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getFilteredProductsData();
+  }, [priceRange, selectedSizes, selectedCategories, category]);
+
+  useEffect(() => {
+    if (category) {
+      setSelectedCategories([category]);
+    }
+  }, [category]);
+
   const resetFilters = () => {
     setPriceRange([0, 1000]);
     setSelectedSizes([]);
     setSelectedCategories([]);
   };
-  useEffect(() => {
-    getFilteredProductsData();
-  }, [priceRange, selectedSizes, selectedCategories]);
+
   return (
     <Container>
       {loading ? (

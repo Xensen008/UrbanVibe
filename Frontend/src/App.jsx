@@ -45,6 +45,11 @@ function App() {
                 <ShopListing />
               </ProtectedRoute>
             } />
+            <Route path="/Shop/:category" element={
+              <ProtectedRoute>
+                <ShopListing />
+              </ProtectedRoute>
+            } />
             <Route path="/Wishlist" element={
               <ProtectedRoute>
                 <Favourite />
