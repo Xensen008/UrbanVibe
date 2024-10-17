@@ -58,17 +58,47 @@ export const getproducts = async (req, res, next) => {
 
 
 export const getProductById = async (req, res, next) => {
-    try{
-        const {id} = req.params;
-        if(!mongoose.isValidObjectId(id)){
-            return next(createError(404, "Invalid Product ID"));
+    try {
+        const { id } = req.params;
+        if (id === 'search') {
+            return next(); // Pass control to the next matching route (search)
+        }
+        if (!mongoose.isValidObjectId(id)) {
+            return next(createError(400, "Invalid Product ID"));
         }
         const product = await Product.findById(id);
-        if(!product){
+        if (!product) {
             return next(createError(404, "Product not found"));
         }
-        res.status(200).json(product);  
-    }catch(error){
-        next(error)
+        res.status(200).json(product);
+    } catch (error) {
+        next(error);
     }
-}
+};
+
+export const searchProducts = async (req, res, next) => {
+    try {
+        const { q } = req.query;
+        console.log('Received search query:', q);
+        if (!q) {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
+
+        const searchRegex = new RegExp(q, 'i');
+        const products = await Product.find({
+            $or: [
+                { name: { $regex: searchRegex } },
+                { description: { $regex: searchRegex } },
+                { category: { $regex: searchRegex } },
+                { sizes: { $regex: searchRegex } }
+            ]
+        }).select('_id name price img category sizes').limit(20);
+
+        console.log('Found products:', products.length);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error in searchProducts:', error);
+        next(error);
+    }
+};
+

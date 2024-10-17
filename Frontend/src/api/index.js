@@ -77,15 +77,26 @@ export const getOrders = async (token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  export const markOrderAsDelivered = async (token, orderId) =>
-    await API.patch(`/user/order/deliver`, { orderId }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  
-  // Update the existing cancelOrder function to use the new route
-  export const cancelOrder = async (token, orderId) =>
-    await API.patch(`/user/order/cancel`, { orderId }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+export const markOrderAsDelivered = async (token, orderId) =>
+  await API.patch(`/user/order/deliver`, { orderId }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-  
+// Update the existing cancelOrder function to use the new route
+export const cancelOrder = async (token, orderId) =>
+  await API.patch(`/user/order/cancel`, { orderId }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+
+export const searchProducts = async (query) => {
+  try {
+    console.log('Searching for:', query);
+    const response = await API.get(`/product/search?q=${encodeURIComponent(query)}`);
+    console.log('Search API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw error;
+  }
+};

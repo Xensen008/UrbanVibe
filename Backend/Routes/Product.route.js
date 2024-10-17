@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProduct, getproducts, getProductById } from '../Controllers/Product.control.js';
+import { addProduct, getproducts, getProductById, searchProducts} from '../Controllers/Product.control.js';
 
 const router = express.Router();
 
@@ -12,5 +12,10 @@ router.get('/', getproducts);
 // Route to get product by ID
 router.get('/:id', getProductById);
 
-export default router;
+// Route to search products
+router.get('/search', searchProducts);
 
+// Route to get product by ID
+router.get('/:id', getProductById);
+
+export default router;

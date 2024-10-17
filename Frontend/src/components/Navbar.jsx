@@ -8,6 +8,7 @@ import { MenuRounded } from '@mui/icons-material'
 import { Avatar } from '@mui/material'
 import { logout } from "../Redux/reducer/userSlice";
 import { useDispatch } from "react-redux";
+import SearchModal from './SearchModal';
 
 const Nav = styled.nav`
   background-color: ${({ theme }) => theme.bg};
@@ -160,6 +161,7 @@ const TextButton = styled.div`
 function Navbar({ openAuth, setOpenAuth, currentUser }) {
   const [isOpen, setIsOpen] = React.useState(false)
   const dispatch = useDispatch();
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   return (
     <Nav>
       <NavbarContainer>
@@ -223,7 +225,7 @@ function Navbar({ openAuth, setOpenAuth, currentUser }) {
         )}
 
         <Mobileicons>
-          <Navlink to="/search">
+          <Navlink onClick={() => setIsSearchOpen(true)}>
             <SearchRounded sx={{ color: "inherit", fontSize: "30px" }} />
           </Navlink>
 
@@ -257,7 +259,7 @@ function Navbar({ openAuth, setOpenAuth, currentUser }) {
         </Mobileicons>
 
         <ButtonContainer>
-          <Navlink to="/search">
+          <Navlink onClick={() => setIsSearchOpen(true)}>
             <SearchRounded sx={{ color: "inherit", fontSize: "30px" }} />
           </Navlink>
 
@@ -291,6 +293,7 @@ function Navbar({ openAuth, setOpenAuth, currentUser }) {
           )}
         </ButtonContainer>
       </NavbarContainer>
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </Nav>
   );
 }
