@@ -37,13 +37,26 @@ const Filters = styled.div`
     overflow-y: auto;
   }
 `;
-
+const FilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+`;
+const Title = styled.div`
+  font-size: 20px;
+  font-weight: 500;
+`;
+const Menu = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
 const Products = styled.div`
   flex: 1;
   padding: 12px;
   overflow-y: auto;
 `;
-
 const CardWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -136,7 +149,7 @@ const ShopListing = () => {
     setSelectedSizes([]);
     setSelectedCategories([]);
   };
-
+  
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
   };
