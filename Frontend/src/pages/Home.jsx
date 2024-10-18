@@ -10,15 +10,16 @@ import { getAllProducts } from '../api'
 
 const Container = styled.div`
   padding: 20px 30px;
-  padding-bottom: 200px
+  padding-bottom: 200px;
   height: 100%;
   overflow-y: scroll;
   display: flex;
   align-items: center;
   flex-direction: column;
   gap: 30px;
-  @media (max-width: 768px) {
-    padding: 20px 12px;
+  @media (max-width: 48em) {
+    padding: 1.25rem 0.75rem;
+    gap: 1.875rem;
     scroll-behavior: smooth;
   }
   background: ${({ theme }) => theme.bg};
@@ -29,14 +30,18 @@ const Section = styled.section`
   display: flex;
   gap: 28px;
   flex-direction: column;
+  @media (max-width: 48em) {
+    padding: 2rem 0;
+    gap: 1.75rem;
+  }
 `
 const Img = styled.img`
   width: 100%;
   object-fit: cover;
   max-width: 1400px;
   height: 700px;
-  @media (max-width: 768px) {
-    height: 600px;
+  @media (max-width: 48em) {
+    height: 37.5rem;
   }
 `
 const Title = styled.div`
@@ -45,17 +50,18 @@ const Title = styled.div`
   display: flex;
   justify-content: ${({ center }) => (center ? 'center' : 'space-between')};
   align-items: center; 
-
+  @media (max-width: 48em) {
+    font-size: 1.5rem;
+  }
 `
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
   justify-content: center;
-  @media (max-width: 768px) {
-    gap: 12px;
+  @media (max-width: 48em) {
+    gap: 0.75rem;
   }
-
 `
 const AnimatedSection = motion.create(Section)
 function Home() {
