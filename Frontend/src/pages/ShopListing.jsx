@@ -12,36 +12,58 @@ const Container = styled.div`
   height: 100vh;
   overflow-y: auto;
   display: flex;
+  align-items: center;
   gap: 30px;
-  background: ${({ theme }) => theme.bg};
-
   @media (max-width: 768px) {
-    padding: 20px 12px;
     flex-direction: column;
+    padding: 10px;
   }
+  background: ${({ theme }) => theme.bg};
 `;
 
 const Filters = styled.div`
-  width: 230px;
+  width: 90%;
   height: fit-content;
+  overflow-y: auto;
   padding: 20px 16px;
-
+  @media (min-width: 768px) {
+    height: 100%;
+    width: 230px;
+    overflow-y: scroll;
+  }
   @media (max-width: 768px) {
     width: 100%;
-    padding: 10px;
+    height: auto;
+    padding: 0;
+    margin-bottom: 20px;
   }
 `;
 
-const FilterSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 12px;
+const FilterTabs = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
 `;
 
-const Title = styled.div`
-  font-size: 20px;
-  font-weight: 500;
+const FilterTab = styled.button`
+  background: ${({ active, theme }) => active ? theme.primary : theme.bg};
+  color: ${({ active, theme }) => active ? theme.text_primary : theme.text_secondary};
+  border: none;
+  padding: 10px;
+  flex: 1;
+  cursor: pointer;
+`;
+
+const FilterContent = styled.div`
+  @media (max-width: 768px) {
+    display: ${({ active }) => active ? 'block' : 'none'};
+    max-height: 200px;
+    overflow-y: auto;
+  }
 `;
 
 const Menu = styled.div`
@@ -51,24 +73,30 @@ const Menu = styled.div`
 `;
 
 const Products = styled.div`
-  flex: 1;
   padding: 12px;
-  overflow-y: auto;
-
+  overflow: hidden;
+  height: fit-content;
+  @media (min-width: 768px) {
+    width: 100%;
+    overflow-y: scroll;
+    height: 100%;
+  }
   @media (max-width: 768px) {
     width: 100%;
   }
 `;
 
 const CardWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   justify-content: center;
-
+  @media (max-width: 750px) {
+    gap: 14px;
+  }
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 10px;
   }
 `;
 
@@ -108,6 +136,7 @@ const ShopListing = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(category ? [category] : []);
+  const [activeFilterTab, setActiveFilterTab] = useState('category');
 
   const getFilteredProductsData = async () => {
     setLoading(true);
@@ -161,12 +190,32 @@ const ShopListing = () => {
       ) : (
         <>
           <Filters>
+            <FilterTabs>
+              <FilterTab 
+                active={activeFilterTab === 'category'} 
+                onClick={() => setActiveFilterTab('category')}
+              >
+                Category
+              </FilterTab>
+              <FilterTab 
+                active={activeFilterTab === 'size'} 
+                onClick={() => setActiveFilterTab('size')}
+              >
+                Size
+              </FilterTab>
+              <FilterTab 
+                active={activeFilterTab === 'price'} 
+                onClick={() => setActiveFilterTab('price')}
+              >
+                Price
+              </FilterTab>
+            </FilterTabs>
             <Menu>
               {filter.map((filters, index) => (
-                <FilterSection key={`filter-${index}`}>
-                  <Title>{filters.name}</Title>
-                  {filters.value === "price" ? (
-                    <>
+                <FilterContent key={`filter-${index}`} active={activeFilterTab === filters.value}>
+                  <FilterSection>
+                    <Title>{filters.name}</Title>
+                    {filters.value === "price" ? (
                       <Slider
                         getAriaLabel={() => 'Price range'}
                         value={priceRange}
@@ -179,49 +228,45 @@ const ShopListing = () => {
                         ]}
                         onChange={(e, newValue) => setPriceRange(newValue)}
                       />
-                    </>
-                  ) : filters.value === "size" ? (
-                    <Item>
-                      {filters.items.map((item) => (
-                        <SelectableItem
-                          key={item}
-                          selected={selectedSizes.includes(item)}
-                          onClick={() =>
-                            setSelectedSizes((prevSizes) =>
-                              prevSizes.includes(item)
-                                ? prevSizes.filter(
-                                    (size) => size !== item
-                                  )
-                                : [...prevSizes, item]
-                            )
-                          }
-                        >
-                          {item}
-                        </SelectableItem>
-                      ))}
-                    </Item>
-                  ) : filters.value === "category" ? (
-                    <Item>
-                      {filters.items.map((item) => (
-                        <SelectableItem
-                          key={item}
-                          selected={selectedCategories.includes(item)}
-                          onClick={() =>
-                            setSelectedCategories((prevCategories) =>
-                              prevCategories.includes(item)
-                                ? prevCategories.filter(
-                                    (category) => category !== item
-                                  )
-                                : [...prevCategories, item]
-                            )
-                          }
-                        >
-                          {item}
-                        </SelectableItem>
-                      ))}
-                    </Item>
-                  ) : null}
-                </FilterSection>
+                    ) : filters.value === "size" ? (
+                      <Item>
+                        {filters.items.map((item) => (
+                          <SelectableItem
+                            key={item}
+                            selected={selectedSizes.includes(item)}
+                            onClick={() =>
+                              setSelectedSizes((prevSizes) =>
+                                prevSizes.includes(item)
+                                  ? prevSizes.filter((size) => size !== item)
+                                  : [...prevSizes, item]
+                              )
+                            }
+                          >
+                            {item}
+                          </SelectableItem>
+                        ))}
+                      </Item>
+                    ) : filters.value === "category" ? (
+                      <Item>
+                        {filters.items.map((item) => (
+                          <SelectableItem
+                            key={item}
+                            selected={selectedCategories.includes(item)}
+                            onClick={() =>
+                              setSelectedCategories((prevCategories) =>
+                                prevCategories.includes(item)
+                                  ? prevCategories.filter((category) => category !== item)
+                                  : [...prevCategories, item]
+                              )
+                            }
+                          >
+                            {item}
+                          </SelectableItem>
+                        ))}
+                      </Item>
+                    ) : null}
+                  </FilterSection>
+                </FilterContent>
               ))}
               <ResetButton variant="outlined" onClick={resetFilters}>
                 Reset Filters
