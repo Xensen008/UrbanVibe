@@ -8,12 +8,13 @@ import { Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 
 const Container = styled.div`
-  padding: 1.25rem 1.875rem;
+  padding: 1.25rem 1rem;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   align-items: flex-start;
-  gap: 1.875rem;
+  gap: 1rem;
   background: ${({ theme }) => theme.bg};
   @media (max-width: 48em) {
     flex-direction: column;
@@ -22,23 +23,22 @@ const Container = styled.div`
 `;
 
 const Filters = styled.div`
-  width: 90%;
-  max-width: 14.375rem;
+  width: 100%;
+  max-width: 14rem;
   height: fit-content;
   overflow-y: auto;
-  padding: 1.25rem 1rem;
+  padding: 1rem;
   @media (min-width: 48em) {
     height: 100%;
     overflow-y: scroll;
   }
   @media (max-width: 48em) {
-    width: 100%;
     max-width: 100%;
     position: sticky;
     top: 0;
     background: ${({ theme }) => theme.bg};
     z-index: 1;
-    padding: 0.625rem;
+    padding: 0.5rem;
   }
 `;
 
@@ -73,27 +73,29 @@ const Products = styled.div`
   flex: 1;
   padding: 0.75rem;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
   @media (max-width: 48em) {
-    height: calc(100vh - 12.5rem); // Adjust based on your filter height
+    height: calc(100vh - 12rem); // Adjust based on your filter height
   }
 `;
 
 const CardWrapper = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
   justify-content: center;
   @media (max-width: 48em) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.875rem;
+    gap: 0.75rem;
   }
 `;
 
 const FilterSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 0.75rem;
+  gap: 0.75rem;
+  padding: 0.5rem;
 `;
 
 const Title = styled.div`
@@ -104,7 +106,7 @@ const Title = styled.div`
 const Item = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.625rem;
+  gap: 0.5rem;
 `;
 
 const SelectableItem = styled.div`
@@ -112,9 +114,9 @@ const SelectableItem = styled.div`
   display: flex;
   border: 1px solid ${({ theme }) => theme.text_secondary + 50};
   color: ${({ theme }) => theme.text_secondary + 90};
-  border-radius: 0.5rem;
-  padding: 0.125rem 0.5rem;
-  font-size: 1rem;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875rem;
   ${({ selected, theme }) =>
     selected &&
     `

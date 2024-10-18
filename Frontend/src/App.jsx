@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 import { lightTheme, darkTheme } from "./utils/Themes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -15,6 +15,12 @@ import ProductDetails from "./pages/ProductDetails";
 import { useSelector } from "react-redux";
 import ToastMsg from "./components/ToastMsg";
 import ProtectedRoute from "./components/Protection/ProtectedRoute";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    overflow-x: hidden;
+  }
+`;
 
 const Container = styled.div`
   width: 100%;
@@ -36,6 +42,7 @@ function App() {
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
+        <GlobalStyle />
         <Container>
           <Navbar openAuth={openAuth} setOpenAuth={setOpenAuth} currentUser={currentUser} />
           <Routes>
