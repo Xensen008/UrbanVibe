@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from 'styled-components'
-import ProductCard from '../components/Cards/ProductCard'
+import ProductCard from '../components/cards/ProductCard'
 import { motion } from 'framer-motion';
 import { getFavourite } from "../api";
 import { CircularProgress } from "@mui/material";

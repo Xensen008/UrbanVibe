@@ -251,13 +251,13 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
             onClick={() => (favorite ? removeFavorite() : addFavorite())}
           >
             {favoriteLoading ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 0.5 }}
-                transition={{ duration: 0.2 }}
-              >
+              // <motion.div
+              //   initial={{ scale: 0 }}
+              //   animate={{ scale: 0.5 }}
+              //   transition={{ duration: 0.2 }}
+              // >
                 <FavoriteRounded sx={{ fontSize: "20px", color: "red" }} />
-              </motion.div>
+              // </motion.div>
             ) : (
               <>
                 {favorite ? (
