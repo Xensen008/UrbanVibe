@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
-import ProductCard from '../components/cards/ProductCard'
+import ProductCard from '../components/Cards/ProductCard'
 import { getAllProducts } from '../api'
 import { useDispatch } from 'react-redux'
 import { openSnackbar } from '../Redux/reducer/snackbarSlice'
