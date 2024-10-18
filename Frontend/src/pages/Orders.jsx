@@ -10,6 +10,7 @@ const Container = styled.div`
   padding-bottom: 200px;
   height: 100%;
   overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,7 +19,7 @@ const Container = styled.div`
 
 const Section = styled(motion.div)`
   max-width: 1200px;
-  width: 100%;
+  width: 110%;
   padding: 40px 0;
   display: flex;
   flex-direction: column;
