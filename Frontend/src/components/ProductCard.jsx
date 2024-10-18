@@ -4,7 +4,6 @@ import Rating from '@mui/material/Rating';
 import { useNavigate } from 'react-router-dom';
 import { AddShoppingCartRounded, FavoriteRounded } from '@mui/icons-material';
 import { AddShoppingCartOutlined } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
 import { addToFavourite, deleteFromFavourite,getFavourite , addToCart} from '../../api';
 import { openSnackbar } from '../../Redux/reducer/snackbarSlice';
 import { FavoriteBorder } from '@mui/icons-material';
