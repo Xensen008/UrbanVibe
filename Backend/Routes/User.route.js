@@ -13,7 +13,7 @@ import {
   markOrderAsDelivered,
   removeFromFavourite, 
 } from "../Controllers/User.control.js";
-import { verifyToken } from "../middleware/verifyToken.js";
+import { verifyToken } from "../Middleware/verifyToken.js";
 const router = express.Router();
 //Auth
 router.post("/signup",  UserRegister);
