@@ -129,6 +129,18 @@ const ResetButton = styled(Button)`
   margin-top: 16px;
 `;
 
+const FilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+`;
+
+const Title = styled.div`
+  font-size: 20px;
+  font-weight: 500;
+`;
+
 const ShopListing = () => {
   const { category } = useParams();
   const [loading, setLoading] = useState(false);
