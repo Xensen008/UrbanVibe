@@ -12,57 +12,62 @@ const Container = styled.div`
   height: 100vh;
   overflow-y: auto;
   display: flex;
-  align-items: center;
   gap: 30px;
+  background: ${({ theme }) => theme.bg};
+
   @media (max-width: 768px) {
     padding: 20px 12px;
     flex-direction: column;
-    overflow-y: auto;
   }
-  background: ${({ theme }) => theme.bg};
 `;
+
 const Filters = styled.div`
-  width: 90%;
+  width: 230px;
   height: fit-content;
-  overflow-y: auto;
   padding: 20px 16px;
-  @media (min-width: 768px) {
-    height: 100%;
-    width: 230px;
-    overflow-y: scroll;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 10px;
   }
 `;
+
 const FilterSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 12px;
 `;
+
 const Title = styled.div`
   font-size: 20px;
   font-weight: 500;
 `;
+
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
 `;
+
 const Products = styled.div`
+  flex: 1;
   padding: 12px;
-  overflow: hidden;
-  height: fit-content;
-  @media (min-width: 768px) {
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
     width: 100%;
-    overflow-y: scroll;
-    height: 100%;
   }
 `;
+
 const CardWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
   justify-content: center;
-  @media (max-width: 750px) {
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
 `;
@@ -91,6 +96,7 @@ const SelectableItem = styled.div`
   font-weight: 500;
   `}
 `;
+
 const ResetButton = styled(Button)`
   margin-top: 16px;
 `;
