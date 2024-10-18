@@ -10,21 +10,21 @@ import { useParams } from "react-router-dom";
 const Container = styled.div`
   padding: 20px 30px;
   height: 100vh;
-  overflow-y: hidden;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   gap: 30px;
   @media (max-width: 768px) {
     padding: 20px 12px;
     flex-direction: column;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
   background: ${({ theme }) => theme.bg};
 `;
 const Filters = styled.div`
   width: 90%;
   height: fit-content;
-  overflow-y: hidden;
+  overflow-y: auto;
   padding: 20px 16px;
   @media (min-width: 768px) {
     height: 100%;
@@ -53,7 +53,7 @@ const Products = styled.div`
   height: fit-content;
   @media (min-width: 768px) {
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
   }
 `;

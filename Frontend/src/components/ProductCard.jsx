@@ -255,7 +255,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
             onClick={() => (favorite ? removeFavorite() : addFavorite())}
           >
             {favoriteLoading ? (
-              <FavoriteRounded sx={{ fontSize: "20px" }} />
+              <FavoriteBorder sx={{ fontSize: "20px" }} />
             ) : (
               <>
                 {favorite ? (
