@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 const Container = styled.div`
   padding: 20px 30px;
   height: 100vh;
-  overflow-y: auto;
+  // overflow-y: auto;
   display: flex;
   align-items: center;
   gap: 30px;
@@ -34,7 +34,7 @@ const Filters = styled.div`
   }
   @media (max-width: 768px) {
     width: 100%;
-    height: 310rem;
+    // height: 310rem;
     padding: 0;
     margin-bottom: 20px;
   }
