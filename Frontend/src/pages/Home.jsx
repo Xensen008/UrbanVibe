@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import HeroImg from '../utils/Images/Header.png'
 import { category } from '../utils/data'
 import ProductCategoryCard from '../components/ProductCategoryCard'
-import ProductCard from '../components/cards/ProductCard'
+import ProductCard from '../components/ProductCard'
 import { motion } from 'framer-motion'
 import { getAllProducts } from '../api'
 
