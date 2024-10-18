@@ -129,6 +129,12 @@ const ResetButton = styled(Button)`
   margin-top: 1rem;
 `;
 
+const Menu = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
 const ShopListing = () => {
   const { category } = useParams();
   const [loading, setLoading] = useState(false);
