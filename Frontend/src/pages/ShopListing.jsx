@@ -8,45 +8,46 @@ import { Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 
 const Container = styled.div`
-  padding: 20px 30px;
+  padding: 1.25rem 1.875rem;
   height: 100vh;
-  // overflow-y: auto;
+  overflow-y: auto;
   display: flex;
-  align-items: center;
-  gap: 30px;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 10px;
-    height: 100%; 
-  }
+  align-items: flex-start;
+  gap: 1.875rem;
   background: ${({ theme }) => theme.bg};
+  @media (max-width: 48em) {
+    flex-direction: column;
+    padding: 0.625rem;
+  }
 `;
 
 const Filters = styled.div`
   width: 90%;
+  max-width: 14.375rem;
   height: fit-content;
   overflow-y: auto;
-  padding: 20px 16px;
-  @media (min-width: 768px) {
+  padding: 1.25rem 1rem;
+  @media (min-width: 48em) {
     height: 100%;
-    width: 230px;
     overflow-y: scroll;
   }
-  @media (max-width: 768px) {
+  @media (max-width: 48em) {
     width: 100%;
-    // height: 310rem;
-    padding: 0;
-    margin-bottom: 20px;
+    max-width: 100%;
+    position: sticky;
+    top: 0;
+    background: ${({ theme }) => theme.bg};
+    z-index: 1;
+    padding: 0.625rem;
   }
 `;
 
 const FilterTabs = styled.div`
   display: none;
-
-  @media (max-width: 768px) {
+  @media (max-width: 48em) {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
   }
 `;
 
@@ -54,59 +55,56 @@ const FilterTab = styled.button`
   background: ${({ active, theme }) => active ? theme.primary : theme.bg};
   color: ${({ active, theme }) => active ? theme.text_primary : theme.text_secondary};
   border: none;
-  padding: 10px;
+  padding: 0.625rem;
   flex: 1;
   cursor: pointer;
+  font-size: 0.875rem;
 `;
 
 const FilterContent = styled.div`
-  @media (max-width: 768px) {
+  @media (max-width: 48em) {
     display: ${({ active }) => active ? 'block' : 'none'};
-    max-height: 200px;
+    max-height: 12.5rem;
     overflow-y: auto;
   }
-`;
-
-const Menu = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 `;
 
 const Products = styled.div`
-  padding: 12px;
-  overflow: hidden;
-  height: fit-content;
-  @media (min-width: 768px) {
-    width: 100%;
-    overflow-y: scroll;
-    height: 100%;
-  }
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 60vh; // Adjust this value as needed
-    overflow-y: auto;
+  flex: 1;
+  padding: 0.75rem;
+  overflow-y: auto;
+  @media (max-width: 48em) {
+    height: calc(100vh - 12.5rem); // Adjust based on your filter height
   }
 `;
 
 const CardWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 1.5rem;
   justify-content: center;
-  @media (max-width: 750px) {
-    gap: 14px;
-  }
-  @media (max-width: 768px) {
+  @media (max-width: 48em) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 0.875rem;
   }
+`;
+
+const FilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem;
+`;
+
+const Title = styled.div`
+  font-size: 1.25rem;
+  font-weight: 500;
 `;
 
 const Item = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 0.625rem;
 `;
 
 const SelectableItem = styled.div`
@@ -114,34 +112,21 @@ const SelectableItem = styled.div`
   display: flex;
   border: 1px solid ${({ theme }) => theme.text_secondary + 50};
   color: ${({ theme }) => theme.text_secondary + 90};
-  border-radius: 8px;
-  padding: 2px 8px;
-  font-size: 16px;
-  width: fit-content;
+  border-radius: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 1rem;
   ${({ selected, theme }) =>
     selected &&
     `
-  border: 1px solid ${theme.text_primary};
-  color: ${theme.text_primary};
-  background: ${theme.text_primary + 30};
-  font-weight: 500;
+    border: 1px solid ${theme.text_primary};
+    color: ${theme.text_primary};
+    background: ${theme.text_primary + 30};
+    font-weight: 500;
   `}
 `;
 
 const ResetButton = styled(Button)`
-  margin-top: 16px;
-`;
-
-const FilterSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 12px;
-`;
-
-const Title = styled.div`
-  font-size: 20px;
-  font-weight: 500;
+  margin-top: 1rem;
 `;
 
 const ShopListing = () => {
