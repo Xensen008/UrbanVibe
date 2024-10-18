@@ -76,7 +76,7 @@ function ContactUs() {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:3000/api/send-email', formData);
+      await axios.post('https://urbanvibe.onrender.com/api/send-email', formData);
       dispatch(openSnackbar({
         message: "Message sent successfully!",
         severity: "success",
