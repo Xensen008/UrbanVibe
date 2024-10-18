@@ -17,6 +17,7 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     padding: 10px;
+    height: 100%; 
   }
   background: ${({ theme }) => theme.bg};
 `;
@@ -33,7 +34,7 @@ const Filters = styled.div`
   }
   @media (max-width: 768px) {
     width: 100%;
-    height: auto;
+    height: 310rem;
     padding: 0;
     margin-bottom: 20px;
   }
@@ -83,6 +84,8 @@ const Products = styled.div`
   }
   @media (max-width: 768px) {
     width: 100%;
+    height: 60vh; // Adjust this value as needed
+    overflow-y: auto;
   }
 `;
 
