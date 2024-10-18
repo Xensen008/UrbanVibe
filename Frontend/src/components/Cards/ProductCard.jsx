@@ -6,10 +6,10 @@ import { AddShoppingCartRounded, FavoriteRounded } from '@mui/icons-material';
 import { AddShoppingCartOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { addToFavourite, deleteFromFavourite,getFavourite , addToCart} from '../../api';
-import { useSelector } from 'react-redux';
 import { openSnackbar } from '../../Redux/reducer/snackbarSlice';
 import { FavoriteBorder } from '@mui/icons-material';
 import { motion } from "framer-motion";
+import { useSelector, useDispatch } from 'react-redux';
 
 const Image = styled.img`
   width: 100%;
@@ -156,6 +156,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
   const dispatch = useDispatch();
   const [favorite, setFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const addFavorite = async () => {
     setFavoriteLoading(true);
@@ -212,6 +213,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
   };
   const checkFavourite = async () => {
     if (!product) return; // Exit if product is not loaded yet
+    if(!currentUser) return;
     setFavoriteLoading(true);
     const token = localStorage.getItem("Urban-token");
     try {
@@ -238,10 +240,10 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
     }
   };
   useEffect(() => {
-    if (product) {
+    if (product && currentUser) {
       checkFavourite();
     }
-  }, [product]);
+  }, [product, currentUser]);
   return (
     <Card>
       <Top>
