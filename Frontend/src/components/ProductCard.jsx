@@ -158,6 +158,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const addFavorite = async () => {
+    if(!currentUser) return;
     setFavoriteLoading(true);
     const token = localStorage.getItem("Urban-token");
     await addToFavourite(token, { productId: product?._id })
@@ -177,6 +178,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
       });
   };
   const removeFavorite = async () => {
+    if(!currentUser) return;
     setFavoriteLoading(true);
     const token = localStorage.getItem("Urban-token");
     await deleteFromFavourite(token, { productId: product?._id })
@@ -196,6 +198,7 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
       });
   };
   const addCart = async () => {
+    if(!currentUser) return;
     const token = localStorage.getItem("Urban-token");
     await addToCart(token, { productId: product?._id, quantity: 1 })
       .then((res) => {
