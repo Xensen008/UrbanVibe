@@ -8,61 +8,49 @@ import { Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 
 const Container = styled.div`
-  padding: 20px 30px;
   height: 100vh;
   overflow-y: auto;
   display: flex;
-  align-items: center;
-  gap: 30px;
-  @media (max-width: 768px) {
-    padding: 20px 12px;
-    flex-direction: column;
-    overflow-y: auto;
-  }
+  flex-direction: column;
   background: ${({ theme }) => theme.bg};
 `;
+
+const FilterButton = styled(Button)`
+  display: none;
+  margin: 10px auto;
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
 const Filters = styled.div`
-  width: 90%;
-  height: fit-content;
-  overflow-y: auto;
   padding: 20px 16px;
-  @media (min-width: 768px) {
-    height: 100%;
-    width: 230px;
-    overflow-y: scroll;
-  }
-`;
-const FilterSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 12px;
-`;
-const Title = styled.div`
-  font-size: 20px;
-  font-weight: 500;
-`;
-const Menu = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-const Products = styled.div`
-  padding: 12px;
-  overflow: hidden;
-  height: fit-content;
-  @media (min-width: 768px) {
-    width: 100%;
+  background: ${({ theme }) => theme.bg};
+  @media (max-width: 768px) {
+    display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
     overflow-y: auto;
-    height: 100%;
   }
 `;
+
+const Products = styled.div`
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+`;
+
 const CardWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
   justify-content: center;
-  @media (max-width: 750px) {
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
 `;
@@ -102,6 +90,7 @@ const ShopListing = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(category ? [category] : []);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const getFilteredProductsData = async () => {
     setLoading(true);
@@ -148,13 +137,20 @@ const ShopListing = () => {
     setSelectedCategories([]);
   };
 
+  const toggleFilter = () => {
+    setIsFilterOpen(!isFilterOpen);
+  };
+
   return (
     <Container>
+      <FilterButton variant="outlined" onClick={toggleFilter}>
+        {isFilterOpen ? "Close Filters" : "Open Filters"}
+      </FilterButton>
       {loading ? (
         <CircularProgress />
       ) : (
         <>
-          <Filters>
+          <Filters isOpen={isFilterOpen}>
             <Menu>
               {filter.map((filters, index) => (
                 <FilterSection key={`filter-${index}`}>
