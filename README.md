@@ -5,7 +5,7 @@
 UrbanVibe is a scalable, full-stack e-commerce practice project built to explore modern web technologies and enhance development skills. It’s designed for future expansion, featuring a clean and minimal UI, while leveraging robust backend and frontend integration.
 
 ## Screenshots
-![UrbanVibe Screenshot](./src/assets/urban%20ss.jpg)
+![UrbanVibe Screenshot](./Frontend/src/assets/urban%20ss.jpg)
 
 
 ## Tech Stack  
