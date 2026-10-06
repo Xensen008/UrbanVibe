@@ -252,8 +252,14 @@ function ProductDetails() {
             </div>
             <Rating value={3.5} />
             <Price>
-              ${product?.price?.org} <Span>${product?.price?.mrp}</Span>{" "}
-              <Percent> (${product?.price?.off}% Off) </Percent>
+              ${product?.price?.org}
+              {product?.price?.off > 0 && product?.price?.mrp > product?.price?.org && (
+                <>
+                  {" "}
+                  <Span>${product?.price?.mrp}</Span>{" "}
+                  <Percent> (${product?.price?.off}% Off) </Percent>
+                </>
+              )}
             </Price>
             <Desc>{product?.desc}</Desc>
             <Sizes>

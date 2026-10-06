@@ -285,7 +285,13 @@ function ProductCard({ product, onFavoriteUpdate = () => {} }) {
           {product?.desc}
         </Desc>
         <Price>
-          ${product?.price?.org}  <Span> ${product?.price?.org}</Span> <Percentage>{product?.price?.off}% off</Percentage>
+          ${product?.price?.org}
+          {product?.price?.off > 0 && product?.price?.mrp > product?.price?.org && (
+            <>
+              <Span> ${product?.price?.mrp}</Span>
+              <Percentage>{product?.price?.off}% off</Percentage>
+            </>
+          )}
         </Price>
       </Details>
     </Card>
