@@ -31,7 +31,7 @@ const Title = styled.div`
   font-size: 28px;
   font-weight: 500;
   display: flex;
-  justify-content: ${({ center }) => (center ? "center" : "space-between")};
+  justify-content: ${({ $center }) => ($center ? "center" : "space-between")};
   align-items: center;
 `;
 

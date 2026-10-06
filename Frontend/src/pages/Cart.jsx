@@ -45,7 +45,7 @@ const Title = styled.h1`
   font-size: 25px;
   font-weight: 500;
   display: flex;
-  justify-content: ${({ center }) => (center ? "center" : "space-between")};
+  justify-content: ${({ $center }) => ($center ? "center" : "space-between")};
   align-items: center;
 `;
 

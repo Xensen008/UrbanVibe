@@ -48,7 +48,7 @@ const Title = styled.div`
   font-size: 28px;
   font-weight: 500;
   display: flex;
-  justify-content: ${({ center }) => (center ? 'center' : 'space-between')};
+  justify-content: ${({ $center }) => ($center ? 'center' : 'space-between')};
   align-items: center; 
   @media (max-width: 48em) {
     font-size: 1.5rem;
@@ -119,7 +119,7 @@ function Home() {
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
       >
-        <Title center>Our Bestseller</Title>
+        <Title $center>Our Bestseller</Title>
         <CardWrapper>
           {products?.map((product) => (
             <ProductCard key={product._id} product={product} />

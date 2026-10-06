@@ -52,8 +52,8 @@ const FilterTabs = styled.div`
 `;
 
 const FilterTab = styled.button`
-  background: ${({ active, theme }) => active ? theme.primary : theme.bg};
-  color: ${({ active, theme }) => active ? theme.text_primary : theme.text_secondary};
+  background: ${({ $active, theme }) => $active ? theme.primary : theme.bg};
+  color: ${({ $active, theme }) => $active ? theme.text_primary : theme.text_secondary};
   border: none;
   padding: 0.625rem;
   flex: 1;
@@ -63,7 +63,7 @@ const FilterTab = styled.button`
 
 const FilterContent = styled.div`
   @media (max-width: 48em) {
-    display: ${({ active }) => active ? 'block' : 'none'};
+    display: ${({ $active }) => $active ? 'block' : 'none'};
     max-height: 12.5rem;
     overflow-y: auto;
   }
@@ -117,13 +117,12 @@ const SelectableItem = styled.div`
   border-radius: 0.25rem;
   padding: 0.125rem 0.375rem;
   font-size: 0.875rem;
-  ${({ selected, theme }) =>
-    selected &&
+  ${({ $selected, theme }) =>
+    $selected &&
     `
     border: 1px solid ${theme.text_primary};
     color: ${theme.text_primary};
-    background: ${theme.text_primary + 30};
-    font-weight: 500;
+    background: ${theme.text_secondary + 10};
   `}
 `;
 
@@ -200,19 +199,19 @@ const ShopListing = () => {
           <Filters>
             <FilterTabs>
               <FilterTab 
-                active={activeFilterTab === 'category'} 
+                $active={activeFilterTab === 'category'} 
                 onClick={() => setActiveFilterTab('category')}
               >
                 Category
               </FilterTab>
               <FilterTab 
-                active={activeFilterTab === 'size'} 
+                $active={activeFilterTab === 'size'} 
                 onClick={() => setActiveFilterTab('size')}
               >
                 Size
               </FilterTab>
               <FilterTab 
-                active={activeFilterTab === 'price'} 
+                $active={activeFilterTab === 'price'} 
                 onClick={() => setActiveFilterTab('price')}
               >
                 Price
@@ -220,7 +219,7 @@ const ShopListing = () => {
             </FilterTabs>
             <Menu>
               {filter.map((filters, index) => (
-                <FilterContent key={`filter-${index}`} active={activeFilterTab === filters.value}>
+                <FilterContent key={`filter-${index}`} $active={activeFilterTab === filters.value}>
                   <FilterSection>
                     <Title>{filters.name}</Title>
                     {filters.value === "price" ? (
@@ -241,7 +240,7 @@ const ShopListing = () => {
                         {filters.items.map((item) => (
                           <SelectableItem
                             key={item}
-                            selected={selectedSizes.includes(item)}
+                            $selected={selectedSizes.includes(item)}
                             onClick={() =>
                               setSelectedSizes((prevSizes) =>
                                 prevSizes.includes(item)
@@ -259,7 +258,7 @@ const ShopListing = () => {
                         {filters.items.map((item) => (
                           <SelectableItem
                             key={item}
-                            selected={selectedCategories.includes(item)}
+                            $selected={selectedCategories.includes(item)}
                             onClick={() =>
                               setSelectedCategories((prevCategories) =>
                                 prevCategories.includes(item)

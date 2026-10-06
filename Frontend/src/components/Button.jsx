@@ -16,10 +16,15 @@ const ButtonContainer = styled.button`
   cursor: pointer;
   text-decoration: none;
   transition: all 0.5s ease;
-  ${({ full }) => full && `
+  ${({ $full }) => $full && `
     width: 100%;
   `}
-  ${({ outlined, theme }) => outlined && `
+  ${({ $small }) => $small && `
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  `}
+  ${({ $outlined, theme }) => $outlined && `
     color: ${theme.primary};
     background-color: transparent;
     &:hover {
@@ -32,9 +37,9 @@ const ButtonContainer = styled.button`
   }
 `;
 
-const Button = ({ text, leftIcon, rightIcon, onClick, isLoading, outlined, full, ...props }) => {
+const Button = ({ text, leftIcon, rightIcon, onClick, isLoading, outlined, full, small, ...props }) => {
   return (
-    <ButtonContainer onClick={onClick} outlined={outlined} full={full} {...props}>
+    <ButtonContainer onClick={onClick} $outlined={outlined} $full={full} $small={small} {...props}>
       {isLoading ? (
         <CircularProgress size={24} color="inherit" />
       ) : (
